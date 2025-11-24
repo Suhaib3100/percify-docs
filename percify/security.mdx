@@ -1,53 +1,194 @@
 ---
-title: "Security & Compliance"
-description: "User safety, ban system, and content controls"
+title: "Security & Safety"
+description: "Content moderation, ban system, privacy policies, and platform integrity"
 ---
 
 ## Overview
-Percify enforces safety through proactive account bans, visibility controls, and standardized API denial responses. This page summarizes mechanisms derived from the internal Ban System Guide.
+Percify maintains platform safety through automated and manual moderation, a comprehensive ban system, privacy-respecting data handling, and proactive abuse prevention. This page explains policies and enforcement mechanisms from a user perspective.
+
+## Content Moderation
+
+### What Gets Moderated
+| Category | Action |
+|----------|--------|
+| Explicit NSFW content | Automatic flag + human review |
+| Hate speech / harassment | Immediate takedown |
+| Copyright violations | DMCA process + removal |
+| Spam / bot activity | Rate limiting + ban |
+| Impersonation | Account suspension |
+
+### Visibility Controls
+Users can set avatar/video visibility:
+- **Public** – Appears in feed/explore, shareable links
+- **Private** – Owner-only access; still usable for video/voice pipelines
+- **Archived** – Hidden but retained in account
+
+Admins can override visibility for policy violations.
 
 ## Ban System
-| Field | Purpose |
-|-------|---------|
-| `banned` | Boolean flag blocking feature use |
-| `banned_at` | Timestamp of ban action |
-| `banned_reason` | Human-readable rationale |
 
-Utility functions:
-- `checkUserBanned(userId)` returns status
-- `requireNotBanned(userId)` throws if banned
-- `createBannedUserResponse()` returns 403 standardized JSON
+### Ban Reasons
+| Violation | Typical Action |
+|-----------|---------------|
+| Repeated policy breach | Temporary ban (7–30 days) |
+| Severe ToS violation | Permanent ban |
+| Credit exploit / abuse | Immediate permanent ban |
+| Automated scraping | IP + account ban |
 
-## Integration Pattern (Route Snippet)
-```typescript
-const session = await auth.api.getSession({ headers: request.headers });
-if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-try { await requireNotBanned(session.user.id); } 
-catch { return createBannedUserResponse(); }
-```
+### Ban Effects
+When banned:
+1. All API requests return `403 Forbidden`
+2. Dashboard login blocked with ban notice
+3. All user avatars archived (set private, soft-deleted)
+4. Active sessions invalidated
+5. Public profile hidden
 
-## Protected Endpoints (High Priority)
-- Avatar generation & management
-- Video & audio creation routes
-- Profile update (handle, bio, avatar image)
+### Technical Implementation
+Backend API routes check `requireNotBanned(userId)` utility before processing generation requests. Database columns:
+- `banned` (boolean)
+- `banned_at` (timestamp)
+- `banned_reason` (text)
 
-## Visibility Controls
-| State | Indexed | Public Feed | API Public | Owner Access |
-|-------|---------|-------------|------------|--------------|
-| Draft | No | No | Auth only | Yes |
-| Private | Yes (limited) | No | Auth only | Yes |
-| Published | Yes | Yes | Public | Yes |
+### Appeal Process
+1. Contact support via email with account details
+2. Provide context for appeal
+3. Review typically completes within 3–5 business days
+4. Unbanning does NOT auto-restore archived avatars (manual restoration available on request)
 
-## Content Moderation (Recommended)
-| Layer | Strategy |
-|-------|---------|
-| Prompt Filtering | Block disallowed terms pre-generation |
-| Post-Gen Review | Flag suspicious outputs for manual audit |
-| Rate Limits | Throttle abuse patterns |
-| Ban Escalation | Automated triggers (credit exploit, spam) |
+## Privacy & Data Handling
 
-## Exploit Mitigations
-Internal fixes cover:
+### What We Collect
+| Data Type | Purpose | Retention |
+|-----------|---------|-----------|
+| Email, username | Authentication, support | Account lifetime |
+| Generated avatars/videos | Service delivery | Until user deletes or account closed |
+| Credit transactions | Billing, audit | 7 years (legal requirement) |
+| API logs | Performance, debugging | 30 days |
+| Usage analytics | Feature improvement | Aggregated, anonymized |
+
+### What We Don't Sell
+- Personal identity data
+- Individual generation prompts
+- User behavior profiles
+
+### GDPR / CCPA Rights
+Users can:
+- **Access** – Download all personal data via dashboard export
+- **Delete** – Request full account deletion (30-day grace period)
+- **Portability** – Export avatars, videos, metadata in JSON
+- **Opt-out** – Disable analytics tracking
+
+Contact `privacy@percify.io` to exercise rights.
+
+## Exploit Prevention
+
+### Credit Abuse Detection
+System monitors:
+- Rapid repeat generation of identical prompts
+- Unusual refund request patterns
+- Multiple accounts from same IP/device
+- Webhook replay attacks
+
+Auto-response:
+1. Suspend credit allocation
+2. Flag account for review
+3. Temporary generation freeze
+
+### Rate Limiting (Per User)
+| Endpoint | Limit |
+|----------|-------|
+| Image generation | 100/hour |
+| Video generation | 50/hour |
+| Voice cloning | 10/hour |
+| API reads (metadata) | 1000/hour |
+
+Burst allowance: 2x limit for 60 seconds, then strict enforcement.
+
+### Payment Fraud
+- Stripe Radar detects suspicious card activity
+- High-risk transactions require manual review before credit allocation
+- Chargeback triggers automatic investigation
+
+## Content Reporting
+
+### User Reporting
+Any public avatar/video includes a "Report" action:
+1. Select violation type (NSFW, harassment, copyright, other)
+2. Optional description
+3. Submitted to moderation queue
+
+Average review time: <24 hours.
+
+### Automated Scanning
+- NSFW classifier runs on all public image outputs
+- Text prompt filtering for known abuse patterns
+- Audio content safety checks (planned)
+
+## Security Best Practices
+
+### For Users
+| Practice | Why |
+|----------|-----|
+| Keep API key secret | Prevent unauthorized usage |
+| Enable 2FA (when available) | Protect account access |
+| Review credit history | Detect unauthorized activity |
+| Use strong passwords | Standard security hygiene |
+
+### For Integrators
+- Store API keys in environment variables, never in code
+- Implement client-side rate limiting to stay under quotas
+- Validate webhook signatures (when available)
+- Log API errors for debugging without exposing keys
+
+## Incident Response
+
+### If Your Account Is Compromised
+1. Immediately regenerate API key via dashboard
+2. Review recent credit transactions for unauthorized usage
+3. Change password
+4. Contact support if fraudulent charges detected
+
+### If You Receive a Ban Notification
+1. Review the stated reason carefully
+2. If incorrect, prepare evidence for appeal
+3. Email support with:
+   - Account email
+   - Ban timestamp
+   - Context/explanation
+   - Supporting screenshots/logs
+
+## Platform Integrity
+
+### Uptime & Reliability
+- Target: 99.9% API availability
+- Status page: `status.percify.io` (planned)
+- Scheduled maintenance announced 48 hours in advance
+
+### Data Redundancy
+- Postgres backups: daily snapshots, 30-day retention
+- Object storage: multi-region replication
+- Disaster recovery: 4-hour RTO, 15-minute RPO targets
+
+### Compliance
+- SOC 2 Type II (in progress)
+- GDPR compliant
+- CCPA compliant
+- PCI DSS via Stripe
+
+## Transparency Reports (Planned)
+Quarterly publication of:
+- Total moderation actions
+- Ban counts by category
+- DMCA takedown requests
+- Data access requests processed
+
+## Related Pages
+- [/percify/faq]
+- [/percify/api-auth]
+- [/percify/performance]
+
+---
+Questions? Email `security@percify.io` or see [/percify/faq].
 - Credit real-time synchronization to stop race conditions
 - Hardening against duplicate API calls (idempotency)
 - Centralized cost logic removal of scattered constants

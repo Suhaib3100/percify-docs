@@ -2,11 +2,11 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Percify Docs",
-  "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
-  },
+"colors": {
+  "primary": "#FFD700",
+  "light": "#F5B544",
+  "dark": "#1A1A1A"
+},
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
@@ -53,14 +53,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "Dashboard",
+          "href": "https://percify.io",
+          "icon": "gauge"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Community",
+          "href": "https://discord.gg/percify",
+          "icon": "comments"
         }
       ]
     }
@@ -73,13 +73,13 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:support@percify.io"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://percify.io/dashboard"
     }
   },
   "contextual": {
@@ -96,9 +96,9 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/percify",
+      "github": "https://github.com/dCelestius/percify-ai-avatars",
+      "discord": "https://discord.gg/percify"
     }
   }
 }
