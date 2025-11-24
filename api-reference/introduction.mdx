@@ -1,33 +1,72 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'Percify API Overview'
+description: 'Core concepts, authentication, and response patterns'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Purpose
+The Percify API lets you programmatically generate images, transform them into videos, synthesize voice audio, and retrieve published media assets. All endpoints follow predictable credit-based metering.
 
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+## Base URL
+```
+https://api.percify.io/v1
+```
 
 ## Authentication
-
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
-
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+Use an API key in the `Authorization` header:
 ```
+Authorization: Bearer <API_KEY>
+```
+Keys are scoped per user account. Rotate periodically and never embed client-side.
+
+## Common Endpoints
+| Action | Method | Path |
+|--------|--------|------|
+| Generate Image | POST | /images/generate |
+| Video From Image | POST | /videos/from-image |
+| Clone Voice | POST | /voices/clone |
+| Generate Audio | POST | /audio/generate |
+| Avatar Metadata | GET | /avatars/{avatarId} |
+| Credit Balance | GET | /credits/balance |
+
+## Response Pattern
+Successful async generation requests return a processing object:
+```json
+{
+  "id": "img_123",
+  "status": "processing",
+  "creditCost": 5,
+  "createdAt": "2025-11-24T12:34:56Z"
+}
+```
+Poll the status endpoint (same resource path) until `status` becomes `completed`.
+
+## Errors
+| Status | Meaning | Typical Cause |
+|--------|---------|---------------|
+| 400 | Bad request | Missing required field / invalid duration |
+| 401 | Unauthorized | Missing or bad API key |
+| 403 | Forbidden | Banned user or restricted asset |
+| 404 | Not found | Invalid resource id |
+| 429 | Rate limited | Too many requests in window |
+| 500 | Server error | Internal failure; retry later |
+
+## Idempotency (Recommended)
+For operations that could be retried (e.g., payment intent creation), include an `Idempotency-Key` header. Future endpoints may enforce uniqueness for safety.
+
+## Webhooks (Planned)
+Upcoming event types:
+- `avatar.generated`
+- `video.completed`
+- `audio.completed`
+- `credits.updated`
+
+## OpenAPI Specification
+The full schema resides in `api-reference/openapi.json`. Use it to generate client SDKs or validate requests.
+
+## Next Steps
+- Review authentication details at [/percify/api-auth]
+- Explore endpoint examples in the API Reference tab
+- Learn credit cost formulas at [/percify/credits]
+
+---
+Need a new endpoint? Request via support with use case details.

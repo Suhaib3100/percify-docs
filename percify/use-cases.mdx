@@ -1,0 +1,79 @@
+---
+title: "Use Cases"
+description: "Practical scenarios for leveraging Percify's avatar, video, and voice stack"
+---
+
+## Overview
+Percify enables rapid creation and personalization of media-rich AI avatars. Below are common patterns and how to implement them efficiently with credits and API endpoints.
+
+## Marketing Content Generation
+Produce a themed avatar series for a product launch:
+1. Define brand style keywords ("neon accent", "clean tech", "gradient rim light").
+2. Batch generate 4–6 avatar variants using Standard model for iteration.
+3. Upgrade final selections with Premium for fidelity.
+4. Animate top avatars into 5s clips (base cost only) for social teasers.
+5. Optional voice line to reinforce messaging.
+
+## Personalized User Profiles
+Allow end users to create stylized AI profile pictures:
+1. Collect initial prompt/style preferences.
+2. Generate single Standard output (2 credits) for speed.
+3. Offer refinement / premium upgrade path.
+4. Store resulting avatarId and make it available in profile UI.
+
+## Short Form Video Pipeline
+Turn daily avatar prompts into snackable video content:
+1. Morning batch of 10 prompts → images.
+2. Select top 3 for animation (≤8s each).
+3. Generate a short voice line per video.
+4. Publish and tag for feed discovery.
+
+## Educational Narration
+Use consistent cloned voice across multiple learning clips:
+1. Clone clear voice profile once (5 credits).
+2. Generate short scripted audio lines; keep videos ≤10s for credit control.
+3. Reuse same avatar style for brand continuity.
+
+## Community Spotlight Features
+Weekly spotlight on user-created avatars:
+1. Query top liked avatars via feed endpoints.
+2. Animate winning avatar with a "spotlight" motion style.
+3. Attach congratulatory voice narration.
+4. Publish as featured content (visibility flag).
+
+## Multi-Character Scene (Avatar Cast)
+Create a composite scene for storytelling:
+1. Generate individual avatars separately.
+2. Use Avatar Cast feature (30 credits) for combined scene.
+3. Animate scene with subtle movement; optional group voice line.
+
+## API Chaining Example
+```mermaid
+graph LR;
+  A[Prompt Input] --> B[Image Generation];
+  B --> C[Video From Image];
+  C --> D[Audio Generation];
+  D --> E[Publish];
+```
+
+## Cost Optimization Tips
+| Goal | Strategy |
+|------|----------|
+| Minimum spend | Use Standard model for initial draft |
+| High fidelity | Switch to Premium only for final output |
+| Video scale | Keep most clips at base 5s duration |
+| Voice consistency | Reuse cloned voice; avoid re-cloning |
+| Rapid iteration | Limit variants per prompt to 2–3 |
+
+## Monitoring & Iteration
+- Track credit usage spikes with dashboard summaries.
+- Use performance logs to adjust video durations during peak load.
+- Periodically rotate prompts for freshness in content feeds.
+
+## Related Pages
+- [/percify/quickstart]
+- [/percify/avatar-studio]
+- [/percify/credits]
+
+---
+Need guidance for a custom workflow? See [/percify/faq] or contact support.

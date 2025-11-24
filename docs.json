@@ -14,72 +14,24 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Product Overview",
-            "pages": [
-              "index",
-              "quickstart",
-              "percify/architecture"
-            ]
+            "group": "Overview",
+            "pages": ["index", "quickstart", "percify/use-cases", "percify/architecture"]
           },
           {
-            "group": "Avatar Studio",
-            "pages": [
-              "percify/avatar-studio",
-              "percify/image-to-video",
-              "percify/voice-cloning"
-            ]
+            "group": "Creation Features",
+            "pages": ["percify/avatar-studio", "percify/image-to-video", "percify/voice-cloning"]
           },
           {
             "group": "Credits & Billing",
-            "pages": [
-              "percify/credits",
-              "percify/payments"
-            ]
+            "pages": ["percify/credits", "percify/payments"]
           },
           {
-            "group": "Security & Compliance",
-            "pages": [
-              "percify/security"
-            ]
-          },
-            {
-            "group": "Performance & Scaling",
-            "pages": [
-              "percify/performance"
-            ]
+            "group": "Platform",
+            "pages": ["percify/performance", "percify/security", "percify/faq"]
           },
           {
-            "group": "API Usage",
-            "pages": [
-              "api-reference/introduction",
-              "percify/api-auth"
-            ]
-          },
-          {
-            "group": "FAQ & Troubleshooting",
-            "pages": [
-              "percify/faq"
-            ]
-          },
-          {
-            "group": "Docs Platform Essentials",
-            "pages": [
-              "development",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI Tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
+            "group": "API",
+            "pages": ["api-reference/introduction", "percify/api-auth"]
           }
         ]
       },
@@ -87,7 +39,7 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "Endpoint Examples",
+            "group": "Endpoints",
             "pages": [
               "api-reference/endpoint/get",
               "api-reference/endpoint/create",
