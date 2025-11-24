@@ -1,0 +1,74 @@
+---
+title: "Payments & Billing"
+description: "Credit purchase, payment intents, and balance management"
+---
+
+## Overview
+Users acquire credits via one-off purchases or (future) subscription packs. Stripe Payment Intents are used to ensure strong idempotency and accurate post-payment credit allocation.
+
+## Purchase Flow
+1. User selects credit pack (e.g., 500, 1k, 5k)
+2. Frontend creates Payment Intent via `/api/payments/create-intent`
+3. User completes card authentication
+4. Webhook listens for `payment_intent.succeeded`
+5. Credits added to user balance transactionally
+
+## Webhook Handling (Conceptual)
+```typescript
+// stripe-webhook.ts
+if (event.type === 'payment_intent.succeeded') {
+  const intent = event.data.object;
+  const userId = intent.metadata.userId;
+  const packId = intent.metadata.packId;
+  await allocateCredits(userId, packId, intent.id);
+}
+```
+
+## Idempotency & Safety
+| Concern | Mitigation |
+|---------|-----------|
+| Double credit allocation | Store processed intent IDs |
+| Failed payment after UI success | Rely solely on webhook event |
+| Currency mismatches | Validate amount vs pack definition |
+| Refund adjustments | Implement reverse credit transactions |
+
+## Credit Packs Example
+| Pack | Credits | Price (USD) | Effective / Credit |
+|------|---------|-------------|--------------------|
+| Starter | 500 | $10 | $0.020 |
+| Creator | 1000 | $18 | $0.018 |
+| Scale | 5000 | $80 | $0.016 |
+| Custom | Negotiated | Varies | As agreed |
+
+## Balance Endpoint
+```bash
+curl -H "Authorization: Bearer $PERCIFY_API_KEY" \
+  https://api.percify.io/v1/credits/balance
+```
+Response:
+```json
+{ "balance": 1240, "reserved": 120 }
+```
+Future reserved credits: jobs queued but not yet debited.
+
+## UI Patterns
+- Real-time balance badge near generation actions
+- Pre-flight cost preview vs available balance
+- Post-purchase toast with new balance & usage suggestions
+
+## Failure Scenarios
+| Scenario | Result | User Feedback |
+|----------|--------|---------------|
+| Payment incomplete | No credit change | Show retry CTA |
+| Webhook delayed | Temporary UI mismatch | Poll balance after short delay |
+| Refund issued | Negative credit adjustment | Email + dashboard log |
+
+## Audit Logging
+Store credit allocation events: `{ id, userId, delta, source, referenceId, createdAt }` for reconciliation.
+
+## Related Pages
+- [/percify/credits]
+- [/percify/faq]
+
+---
+Next: Platform safety at [/percify/security].

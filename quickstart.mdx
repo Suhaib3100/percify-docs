@@ -1,80 +1,123 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: "Percify Quickstart"
+description: "From signup to your first animated, voiced avatar in minutes"
 ---
 
-## Get started in three steps
+## Overview
 
-Get your documentation site running locally and make your first customization.
-
-### Step 1: Set up your local environment
+Follow these steps to experience the full Percify creation loop quickly.
 
 <AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
+  <Accordion icon="user-plus" title="1. Create account & sign in">
+    Sign up on the Percify dashboard. Your starter credits appear automatically; if not, visit Billing to purchase a pack.
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
+  <Accordion icon="key" title="2. Get API key">
+    Navigate to Settings → API Keys. Create a key and store it securely. Use it in the `Authorization: Bearer <key>` header for server-side calls.
+  </Accordion>
+  <Accordion icon="image" title="3. Generate your first avatar image">
+    Use the Avatar Studio UI or call the image generation endpoint:
+    ```bash
+    curl -X POST https://api.percify.io/v1/images/generate \
+      -H "Authorization: Bearer $PERCIFY_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{"prompt":"futuristic portrait, soft rim light"}'
+    ```
+    Response includes `id`, `status`, and `creditCost`. Track generation with the returned ID if asynchronous.
+  </Accordion>
+  <Accordion icon="wand-magic-sparkles" title="4. Refine & publish">
+    Adjust prompt, style, or upscale. Publishing marks the avatar as visible in feed/explore unless you set private visibility. Private avatars still usable for video/voice pipelines.
+  </Accordion>
+  <Accordion icon="film" title="5. Convert image → short video">
+    In Studio select "Image to Video". Each clip consumes base + per‑second credits. Keep under 5s for minimal cost. See [/percify/image-to-video] for pricing formula.
+  </Accordion>
+  <Accordion icon="microphone" title="6. Clone a voice & generate audio">
+    Upload a clean sample (≥15s). Voice cloning costs base credits; generating speech adds duration‑based cost. Attach voice track to video from the Studio timeline.
+  </Accordion>
+  <Accordion icon="share" title="7. Share, embed or fetch via API">
+    Use public asset URLs or fetch metadata:
+    ```bash
+    curl -H "Authorization: Bearer $PERCIFY_API_KEY" \
+      https://api.percify.io/v1/avatars/{avatarId}
+    ```
+    Embed in your app or generate derived assets.
+  </Accordion>
+  <Accordion icon="coins" title="8. Monitor credit usage">
+    Dashboard shows per‑feature consumption. For programmatic checks:
+    ```bash
+    curl -H "Authorization: Bearer $PERCIFY_API_KEY" \
+      https://api.percify.io/v1/credits/balance
+    ```
   </Accordion>
 </AccordionGroup>
 
-### Step 2: Deploy your changes
+## Credit Cost Cheatsheet
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+| Feature | Base | Variable | Notes |
+|--------|------|----------|-------|
+| Image Standard (Flux) | 2 | — | Per output |
+| Image Premium (Imagen3/Reality4) | 5 | — | Per output |
+| Percify Yourself | 10 | — | Photo → avatar |
+| Avatar Cast | 30 | — | Multi‑character scene |
+| Voice Cloning | 5 | — | One-time per clone |
+| Audio Generation | 5 | +1/sec | Includes TTS duration |
+| Video Studio | 30 | +6/sec >5s | First 5s in base |
+| Reality Lab | 20 | +4/sec >5s | Cinematic mode |
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+Full rationale: [/percify/credits].
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+## Minimal End-to-End Example (Server)
 
-### Step 3: Go live
+```typescript
+// generate-avatar.ts
+import fetch from 'node-fetch';
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+const API = 'https://api.percify.io/v1';
+const KEY = process.env.PERCIFY_API_KEY!;
 
-## Next steps
+async function run() {
+  // 1. Image
+  const imgRes = await fetch(`${API}/images/generate`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: 'celestial explorer portrait, nebula background' })
+  }).then(r => r.json());
 
-Now that you have your docs running, explore these key features:
+  // 2. Video from image
+  const vidRes = await fetch(`${API}/videos/from-image`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ imageId: imgRes.id, durationSeconds: 5 })
+  }).then(r => r.json());
 
-<CardGroup cols={2}>
+  // 3. Voice line
+  const voiceRes = await fetch(`${API}/audio/generate`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: 'Exploring the stars with Percify.', voiceId: 'default' })
+  }).then(r => r.json());
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
+  console.log({ imgRes, vidRes, voiceRes });
+}
 
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
+run();
+```
 
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
+## Next Steps
 
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+<CardGroup cols={3}>
+  <Card title="Avatar Studio" icon="camera" href="/percify/avatar-studio">Workflows & UI</Card>
+  <Card title="Credits" icon="coins" href="/percify/credits">Pricing logic</Card>
+  <Card title="API Auth" icon="key" href="/percify/api-auth">Authenticate calls</Card>
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## Troubleshooting
+
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| 401 Unauthorized | Missing/invalid API key | Regenerate key in dashboard |
+| Insufficient credits | Balance below feature cost | Purchase credits or lower duration |
+| Slow video generation | High concurrency or long duration | Reduce length or queue workflows |
+| Voice artifacting | Low quality source sample | Re‑record with clean background |
+
+See [/percify/faq] for more.
+

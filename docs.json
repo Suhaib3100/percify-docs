@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Percify Docs",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
@@ -14,23 +14,59 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Product Overview",
             "pages": [
               "index",
               "quickstart",
-              "development"
+              "percify/architecture"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Avatar Studio",
             "pages": [
+              "percify/avatar-studio",
+              "percify/image-to-video",
+              "percify/voice-cloning"
+            ]
+          },
+          {
+            "group": "Credits & Billing",
+            "pages": [
+              "percify/credits",
+              "percify/payments"
+            ]
+          },
+          {
+            "group": "Security & Compliance",
+            "pages": [
+              "percify/security"
+            ]
+          },
+            {
+            "group": "Performance & Scaling",
+            "pages": [
+              "percify/performance"
+            ]
+          },
+          {
+            "group": "API Usage",
+            "pages": [
+              "api-reference/introduction",
+              "percify/api-auth"
+            ]
+          },
+          {
+            "group": "FAQ & Troubleshooting",
+            "pages": [
+              "percify/faq"
+            ]
+          },
+          {
+            "group": "Docs Platform Essentials",
+            "pages": [
+              "development",
               "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
+              "essentials/navigation",
               "essentials/markdown",
               "essentials/code",
               "essentials/images",
@@ -38,7 +74,7 @@
             ]
           },
           {
-            "group": "AI tools",
+            "group": "AI Tools",
             "pages": [
               "ai-tools/cursor",
               "ai-tools/claude-code",
@@ -48,16 +84,10 @@
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
+            "group": "Endpoint Examples",
             "pages": [
               "api-reference/endpoint/get",
               "api-reference/endpoint/create",

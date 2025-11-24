@@ -1,0 +1,66 @@
+---
+title: "Voice Cloning"
+description: "Create reusable voice profiles and generate speech"
+---
+
+## Overview
+Voice cloning lets you build a voice profile from a clean sample and then synthesize natural speech lines to pair with video avatars. Two cost phases: cloning and per-second generation.
+
+## Credit Model
+| Phase | Cost |
+|-------|------|
+| Clone Voice (profile creation) | 5 credits |
+| Generate Speech | 5 base + 1/sec |
+
+## Source Sample Guidelines
+| Parameter | Recommendation |
+|-----------|---------------|
+| Length | 15–60 seconds |
+| Format | WAV or high-bitrate MP3 |
+| Environment | Quiet, minimal reverb |
+| Content | Diverse phonemes, clear articulation |
+
+## Workflow
+1. Upload source sample in Studio (or API)
+2. Cloning job processes & registers voiceId
+3. Use voiceId for subsequent speech synthesis
+4. Attach generated audio to video clip or export standalone
+
+## API Examples
+Clone voice:
+```bash
+curl -X POST https://api.percify.io/v1/voices/clone \
+  -H "Authorization: Bearer $PERCIFY_API_KEY" \
+  -F file=@sample.wav
+```
+Generate speech:
+```bash
+curl -X POST https://api.percify.io/v1/audio/generate \
+  -H "Authorization: Bearer $PERCIFY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"voiceId":"voice_123","text":"Exploring galaxies with Percify."}'
+```
+
+## Best Practices
+| Goal | Tip |
+|------|-----|
+| Natural prosody | Provide expressive source sample |
+| Clarity | Avoid background hum/noise |
+| Rapid iteration | Reuse cloned profile for batches |
+| Sync with video | Match sentence length to clip duration |
+
+## Troubleshooting
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| Metallic artifacts | Low bitrate or noisy source | Re-record sample |
+| Wrong pacing | Text lacks punctuation | Add commas / periods |
+| Credit spike | Long scripted monologue | Split into segments |
+| Desync | Mismatched durations | Adjust video length or trim audio |
+
+## Related Pages
+- [/percify/image-to-video]
+- [/percify/credits]
+- [/percify/faq]
+
+---
+Next: understand pricing deeper at [/percify/credits].

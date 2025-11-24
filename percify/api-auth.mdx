@@ -1,0 +1,64 @@
+---
+title: "API Authentication"
+description: "Using API keys securely with Percify endpoints"
+---
+
+## Overview
+Percify authenticates programmatic access via static API keys scoped to a user account. Keys must be kept server-side—never expose them in client bundles.
+
+## Obtaining a Key
+1. Visit Dashboard → Settings → API Keys
+2. Generate new key (label for internal tracking)
+3. Copy once; regenerate if leaked
+
+## Request Format
+Include header:
+```
+Authorization: Bearer <API_KEY>
+```
+Content-Type header required for JSON POST bodies.
+
+## Example
+```bash
+curl -X POST https://api.percify.io/v1/images/generate \
+  -H "Authorization: Bearer $PERCIFY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"vibrant portrait, rim light"}'
+```
+
+## Verifying Identity
+Server resolves the user from key → attaches userId in request context → ban & credit checks applied.
+
+## Rotation Strategy
+| Scenario | Action |
+|----------|-------|
+| Routine security | Rotate quarterly |
+| Suspected leak | Revoke + regenerate immediately |
+| Ownership transfer | Delete old keys before handoff |
+
+## Handling Failures
+| Status | Meaning | Fix |
+|--------|---------|-----|
+| 401 | Missing/invalid key | Provide valid header |
+| 403 | Banned user | Appeal or resolve violation |
+| 429 | Rate limit | Backoff + retry |
+
+## Storing Keys
+| Environment | Method |
+|-------------|--------|
+| Local Dev | `.env.local` (never commit) |
+| CI/CD | Platform secret manager |
+| Production | Vault / encrypted secrets store |
+
+## Do Not
+- Embed in client-side JavaScript
+- Log full key values
+- Share keys across unrelated services
+
+## Related Pages
+- [/quickstart]
+- [/percify/security]
+- [/api-reference/introduction]
+
+---
+Next: browse endpoints in [/api-reference/introduction].

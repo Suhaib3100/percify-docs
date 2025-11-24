@@ -1,0 +1,85 @@
+---
+title: "Performance & Scaling"
+description: "Optimizations for feed, dashboard, and generation throughput"
+---
+
+## Overview
+Percify performance strategy focuses on query consolidation, targeted indexing, and selective caching. Internal improvements documented in feed and dashboard optimization guides are summarized here for end users and integrators.
+
+## Key Improvements
+| Area | Technique | Result |
+|------|-----------|--------|
+| Dashboard Counts | UNION + filtered COUNT | 800ms → ~150ms |
+| Feed/Explore Query | 9 targeted indexes | 1900ms → 500–700ms |
+| Caching | CDN + stale-while-revalidate | Cache hits ~50–100ms |
+| Counting Strategy | Approx reltuples estimates | Reduced expensive window functions |
+
+## Dashboard Aggregation Pattern
+```sql
+WITH counts AS (
+  SELECT 
+    COUNT(*) FILTER (WHERE source = 'avatars') as avatar_count,
+    COUNT(*) FILTER (WHERE source = 'videos') as video_count,
+    COUNT(*) FILTER (WHERE source = 'voices') as voice_count,
+    COUNT(*) FILTER (WHERE source = 'likes') as liked_count
+  FROM (
+    SELECT 'avatars' FROM user_generated_avatars WHERE user_id = $1 AND COALESCE(hidden_from_feed,false)=false
+    UNION ALL
+    SELECT 'videos' FROM user_video_files WHERE user_id = $1
+    UNION ALL
+    SELECT 'voices' FROM user_audio_files WHERE user_id = $1
+    UNION ALL
+    SELECT 'likes' FROM avatar_likes WHERE user_id = $1
+  ) combined
+)
+SELECT * FROM counts;
+```
+
+## Feed Query Principles
+| Principle | Benefit |
+|-----------|---------|
+| Remove COUNT(*) OVER | Avoid full-table scans |
+| Replace EXISTS with LEFT JOIN | Utilize composite indexes |
+| Partial indexes on visibility | Reduce filtered row set |
+| Separate trending index | Faster popularity sorting |
+
+## Caching Strategy
+| Header | Value |
+|--------|-------|
+| `Cache-Control` | `public, max-age=300, stale-while-revalidate=600` |
+| `Vary` | `Accept-Encoding` |
+
+Use short TTL for freshness + long stale window for resilience.
+
+## Monitoring Recommendations
+- Log query durations >500ms
+- Record generation job queue latency percentiles
+- Track cache hit ratios per endpoint
+
+## Scalability Tips for Integrators
+| Scenario | Recommendation |
+|----------|---------------|
+| Burst avatar generation | Queue jobs + show optimistic UI |
+| Large feed pagination | Use estimated total counts for infinite scroll |
+| High video durations | Batch long renders off peak |
+| Heavy audio synthesis | Reuse voice profiles to skip cloning cost |
+
+## Future Enhancements
+- Materialized view fallback for extreme volumes
+- Adaptive cost suggestions (dynamic UX based on balance)
+- Background warm-up of popular assets
+
+## Troubleshooting
+| Symptom | Cause | Action |
+|---------|-------|-------|
+| Slow dashboard load | Missing indexes | Re-run optimization migration |
+| Feed latency spikes | Cold cache / index bloat | VACUUM ANALYZE + ensure CDN caching |
+| Generation queue delays | Concurrency saturation | Increase worker pool or throttle client |
+
+## Related Pages
+- [/percify/architecture]
+- [/percify/credits]
+- [/percify/faq]
+
+---
+Have questions? See [/percify/faq].

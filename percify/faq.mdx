@@ -1,0 +1,78 @@
+---
+title: "FAQ & Troubleshooting"
+description: "Answers to common questions and issues"
+---
+
+## General
+**Q: What is Percify?**  
+A platform for generating, animating, and voicing AI avatars with a transparent credit model.
+
+**Q: Do credits expire?**  
+Not currently. Future enterprise tiers may introduce rollover policies.
+
+## Credits & Billing
+**Q: Why did my credits decrease unexpectedly?**  
+Likely due to longer video/audio durations. Check cost preview before confirming.
+
+**Q: Can I reserve credits for queued jobs?**  
+Reservation is a planned feature; today credits debit only on success.
+
+## Generation
+**Q: Outputs look repetitive—how to diversify?**  
+Add action or environment keywords; refine with style adjustments.
+
+**Q: Video feels choppy.**  
+Use parallax or subtle pan styles; avoid extreme zoom on short clips.
+
+## Voice
+**Q: Audio has metallic noise.**  
+Source sample quality too low. Re-record in a quiet space at higher bitrate.
+
+**Q: Speech pacing is off.**  
+Add punctuation for natural prosody.
+
+## API
+**Q: Getting 401 Unauthorized.**  
+Missing or invalid `Authorization` header. Regenerate the key if unsure.
+
+**Q: Receiving 403 despite valid key.**  
+Account may be banned. See [/percify/security].
+
+**Q: How to paginate feed results?**  
+Use `?page` or cursor-based endpoints (future). Estimated counts provided to avoid heavy total scans.
+
+## Performance
+**Q: Why is dashboard slow after large imports?**  
+Indexes may not exist or need ANALYZE. Re-run optimization migration and monitor timings.
+
+**Q: Video generation queued.**  
+Peak concurrency; retry later or shorten duration.
+
+## Safety & Moderation
+**Q: Can I appeal a ban?**  
+Yes—contact support with your user handle and reason.
+
+**Q: How do I hide content?**  
+Set avatar/video visibility to Private; remains accessible to you via API.
+
+## Troubleshooting Table
+| Symptom | Likely Cause | Fix |
+|---------|--------------|-----|
+| 401 errors | Missing auth header | Add `Authorization: Bearer` |
+| High credit usage | Long durations | Shorten video/audio |
+| Slow feed | Cold cache / missing indexes | Verify DB optimization |
+| Voice artifacts | Poor sample | Re-record |
+| Desync audio/video | Length mismatch | Trim or re-generate |
+| Banned response | Policy violation | Contact support |
+
+## Support Channels
+- Email (dashboard Support link)
+- Future: Community forum & status page
+
+## Related Pages
+- [/quickstart]
+- [/percify/credits]
+- [/percify/performance]
+
+---
+Need more help? Reach out via support.

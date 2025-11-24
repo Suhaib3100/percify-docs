@@ -1,0 +1,81 @@
+---
+title: "Avatar Studio"
+description: "Concepts, workflows, and UI elements for creating avatars"
+---
+
+## Overview
+The Avatar Studio is the central interface for generating, refining, and publishing AI avatars. It unifies image generation, video transformation, and audio pairing.
+
+## Key Concepts
+| Concept | Description | Credit Impact |
+|---------|-------------|---------------|
+| Prompt | Text describing desired avatar style/content | Cost per image output |
+| Refinement | Iterative prompt/style adjustments | New generation cost |
+| Publish | Make avatar visible in feed/explore | No additional cost |
+| Private Avatar | Hidden from public but usable for downstream features | Standard generation cost |
+| Cast | Multi-avatar, scene-based creation | Higher base (Avatar Cast) |
+
+## Typical Workflow
+1. Enter a concise, vivid prompt ("celestial explorer portrait, iridescent nebula background, soft rim light")
+2. Select model tier (Standard vs Premium)
+3. Generate 1–4 outputs
+4. Choose favorite, refine or upscale
+5. Publish or keep private
+6. (Optional) Start Image → Video pipeline or clone voice
+
+## UI Sections
+| Section | Function |
+|---------|----------|
+| Prompt Input | Core descriptive text & style modifiers |
+| Output Grid | Shows generated variants; supports selection & actions |
+| Details Panel | Metadata: model, cost, timestamps, visibility |
+| Action Bar | Regenerate, upscale, video transform, voice attach |
+| Cost Summary | Dynamic display of expected credit usage before confirmation |
+
+## Best Practices
+- Use 1–2 stylistic keywords + 1 subject + 1 lighting descriptor.
+- Avoid overstuffing prompts; let refinement handle nuance.
+- Keep initial generation output count low for faster iteration.
+- Favor Premium models for cinematic realism (Reality4 / Imagen3).
+
+## Image to Video Transition
+From selected image use "Animate" or "Image → Video" action:
+- Choose duration (5s base recommended)
+- Pick motion style (subtle pan, dynamic zoom, parallax)
+- Preview cost before confirmation
+
+## Cost Preview Logic (Pseudo)
+```typescript
+const cost = duration <= 5
+  ? videoCosts.base
+  : videoCosts.base + (duration - 5) * videoCosts.perSecond;
+```
+
+## Voice Integration
+After video generation, attach existing cloned voice or generate new line:
+1. Select voice profile
+2. Enter text (TTS) or upload recorded sample for mixing
+3. Duration cost applies to audio generation
+
+## Publishing & Visibility
+| State | Feed Visible | API Accessible | Modifiable |
+|-------|--------------|----------------|-----------|
+| Draft | No | Yes (authenticated) | Yes |
+| Published | Yes | Yes (public endpoints) | Limited |
+| Private | No | Yes (owner only) | Yes |
+
+## Troubleshooting
+| Issue | Cause | Resolution |
+|-------|-------|-----------|
+| Blurry outputs | Prompt too vague or upscale skipped | Refine prompt, use upscale |
+| Repetitive poses | Model bias | Add dynamic action keywords |
+| High credit burn | Generating many variants | Limit initial outputs |
+| Dark/overlit images | Lighting mismatch | Add "soft rim light" or "balanced studio lighting" |
+
+## Related Pages
+- [/percify/image-to-video]
+- [/percify/voice-cloning]
+- [/percify/credits]
+
+---
+Ready to animate? Continue to [/percify/image-to-video].

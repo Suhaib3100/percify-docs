@@ -1,0 +1,93 @@
+---
+title: "Security & Compliance"
+description: "User safety, ban system, and content controls"
+---
+
+## Overview
+Percify enforces safety through proactive account bans, visibility controls, and standardized API denial responses. This page summarizes mechanisms derived from the internal Ban System Guide.
+
+## Ban System
+| Field | Purpose |
+|-------|---------|
+| `banned` | Boolean flag blocking feature use |
+| `banned_at` | Timestamp of ban action |
+| `banned_reason` | Human-readable rationale |
+
+Utility functions:
+- `checkUserBanned(userId)` returns status
+- `requireNotBanned(userId)` throws if banned
+- `createBannedUserResponse()` returns 403 standardized JSON
+
+## Integration Pattern (Route Snippet)
+```typescript
+const session = await auth.api.getSession({ headers: request.headers });
+if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+try { await requireNotBanned(session.user.id); } 
+catch { return createBannedUserResponse(); }
+```
+
+## Protected Endpoints (High Priority)
+- Avatar generation & management
+- Video & audio creation routes
+- Profile update (handle, bio, avatar image)
+
+## Visibility Controls
+| State | Indexed | Public Feed | API Public | Owner Access |
+|-------|---------|-------------|------------|--------------|
+| Draft | No | No | Auth only | Yes |
+| Private | Yes (limited) | No | Auth only | Yes |
+| Published | Yes | Yes | Public | Yes |
+
+## Content Moderation (Recommended)
+| Layer | Strategy |
+|-------|---------|
+| Prompt Filtering | Block disallowed terms pre-generation |
+| Post-Gen Review | Flag suspicious outputs for manual audit |
+| Rate Limits | Throttle abuse patterns |
+| Ban Escalation | Automated triggers (credit exploit, spam) |
+
+## Exploit Mitigations
+Internal fixes cover:
+- Credit real-time synchronization to stop race conditions
+- Hardening against duplicate API calls (idempotency)
+- Centralized cost logic removal of scattered constants
+
+## Standard Error Responses
+| Status | Case | Body |
+|--------|------|------|
+| 401 | Missing auth | `{ "error": "Unauthorized" }` |
+| 403 | Banned user | `{ "error": "Access denied", "reason": "banned" }` |
+| 429 | Rate limit | `{ "error": "Too Many Requests" }` |
+| 400 | Validation | `{ "error": "Invalid input" }` |
+
+## Logging & Audit
+Log structure suggestion:
+```json
+{
+  "type": "ban_check",
+  "userId": "usr_123",
+  "result": "blocked",
+  "route": "/api/images/generate",
+  "timestamp": "2025-11-24T12:45:00Z"
+}
+```
+
+## User Data Privacy (High Level)
+- Minimal PII stored (email, optional display name)
+- Media assets segregated by userId
+- Token-based API access (no password sharing)
+
+## Incident Response (Recommended Steps)
+1. Detect anomaly (logs / alerts)
+2. Temporarily ban account (script)
+3. Archive related assets
+4. Review root cause
+5. Restore or escalate permanent ban
+
+## Related Pages
+- [/percify/credits]
+- [/percify/performance]
+- [/percify/faq]
+
+---
+Performance safeguards next: [/percify/performance].

@@ -1,0 +1,77 @@
+---
+title: "Credits System"
+description: "Unified pricing logic, feature costs, and metering rationale"
+---
+
+## Overview
+Percify uses a unified credit model to keep pricing transparent and enable future tier overrides without rewriting feature logic. All generation actions debit credits atomically after success.
+
+## Feature Costs
+| Feature | Base | Increment | Notes |
+|---------|------|-----------|-------|
+| Image Standard (Flux) | 2 | — | Per output |
+| Image Premium (Imagen3 / Reality4) | 5 | — | Per output |
+| Percify Yourself | 10 | — | Photo → avatar |
+| Avatar Cast | 30 | — | Multi-character scene |
+| Voice Cloning | 5 | — | One-time profile creation |
+| Audio Generation | 5 | +1/sec | Duration based |
+| Video Studio | 30 | +6/sec >5s | 5s base window |
+| Reality Lab | 20 | +4/sec >5s | Cinematic motion |
+
+## Centralized Logic (`credit-costs.ts`)
+Exports:
+- `DEFAULT_COSTS` – baseline values
+- `TIER_COSTS` – placeholder map for future tier overrides
+- `getFeatureCost(feature)` – simple lookup
+- `calculateVideoCost(duration, feature)` – base + perSecond dynamic
+- `calculateAudioCost(duration)` – base + perSecond
+
+## Example Usage
+```typescript
+import { calculateVideoCost, getFeatureCost } from '@/lib/credit-costs';
+
+const imageCost = getFeatureCost('imageStandard'); // 2
+const videoCost = calculateVideoCost(12, 'videoStudio'); // 30 + 7*6 = 72
+```
+
+## Debit Flow
+1. User initiates generation
+2. System validates sufficient balance
+3. Job runs (async or inline)
+4. On success → debit transaction committed
+5. On failure → no debit (idempotent)
+
+## UI Display
+Use `getAllCosts()` to present current pricing table; dynamic adjustments possible once tier overrides implemented.
+
+## Future Tier Pricing (Planned)
+| Tier | Override Strategy |
+|------|-------------------|
+| free | Defaults |
+| starter | Potential volume discounts |
+| creator | Premium model cost reduction |
+| scale | Lower per-second video increments |
+| unlimited | Custom negotiated bundle |
+
+## Rationale
+| Goal | Approach |
+|------|----------|
+| Consistency | Single source of truth file |
+| Flexibility | Tier override map ready |
+| Transparency | Deterministic cost formulas |
+| Maintainability | Eliminates 19+ hardcoded scattered values |
+
+## Troubleshooting
+| Problem | Cause | Resolution |
+|---------|-------|-----------|
+| Unexpected high debit | Long durations or cast scenes | Check cost formula before confirming |
+| Mismatch UI vs API cost | Stale client cache | Refresh pricing via API or rebuild |
+| Insufficient balance mid workflow | Multiple queued jobs | Reserve credits (planned feature) |
+
+## Related Pages
+- [/percify/payments]
+- [/percify/image-to-video]
+- [/percify/voice-cloning]
+
+---
+Continue to payment flows at [/percify/payments].

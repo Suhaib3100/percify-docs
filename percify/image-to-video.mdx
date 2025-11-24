@@ -1,0 +1,80 @@
+---
+title: "Image to Video"
+description: "Convert a static avatar into a short animated clip"
+---
+
+## Overview
+Image → Video transforms a generated avatar still into a motion clip. Credit usage scales with duration and feature type (Video Studio vs Reality Lab for cinematic output).
+
+## Duration & Credits
+| Feature | Base (≤5s) | Increment (>5s) | Example (12s) |
+|---------|-----------|-----------------|---------------|
+| Video Studio | 30 | +6/sec | 30 + (7 * 6) = 72 |
+| Reality Lab | 20 | +4/sec | 20 + (7 * 4) = 48 |
+
+Formula:
+```
+if seconds <= 5: cost = base
+else: cost = base + (seconds - 5) * perSecond
+```
+
+## Workflow
+1. Select a published or draft avatar image
+2. Click "Animate" / "Image → Video"
+3. Choose feature type (Studio / Reality Lab)
+4. Set duration (recommend 5–8s for social snippets)
+5. Pick motion style (pan, zoom, parallax, subtle expression change)
+6. Preview credit cost & confirm
+7. Track generation status; result appears in video library
+8. (Optional) Attach or generate an audio track
+
+## API Example
+```bash
+curl -X POST https://api.percify.io/v1/videos/from-image \
+  -H "Authorization: Bearer $PERCIFY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "imageId": "img_123",
+    "durationSeconds": 8,
+    "mode": "studio",
+    "motionStyle": "parallax"
+  }'
+```
+Response:
+```json
+{
+  "id": "vid_456",
+  "status": "processing",
+  "creditCost": 48,
+  "estimatedSeconds": 15
+}
+```
+
+## Performance Notes
+- Shorter durations reduce queue time
+- Reality Lab optimized for cinematic motion at lower incremental cost
+- Reuse existing images rather than regenerating similar prompts
+
+## Best Practices
+| Goal | Tip |
+|------|-----|
+| Natural motion | Keep duration ≤10s |
+| Social share | Use Studio mode for vibrant action |
+| Cinematic feel | Choose Reality Lab + slower parallax |
+| Cost control | Stay at base 5s for previews |
+
+## Troubleshooting
+| Issue | Possible Cause | Solution |
+|-------|----------------|---------|
+| Jerky motion | Motion style too aggressive | Select subtle pan |
+| High cost | Long duration chosen | Reduce seconds or switch mode |
+| Generation timeout | Provider overload | Retry or lower concurrency |
+| Blended artifacts | Source image low quality | Regenerate higher fidelity image |
+
+## Related Pages
+- [/percify/avatar-studio]
+- [/percify/voice-cloning]
+- [/percify/credits]
+
+---
+Next: add speech with [/percify/voice-cloning].

@@ -1,97 +1,58 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Percify Overview"
+description: "What Percify is, what you can build, and where to go next"
 ---
 
-## Setting up
+import { Callout } from 'nextra/components';
 
-Get your documentation site up and running in minutes.
+## What is Percify?
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+Percify is a creative AI platform for generating and managing personalized avatars, transforming images into short form videos, cloning voices, and publishing safe, performant user‑generated media at scale. You get:
 
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
+<Columns cols={3}>
+  <Card title="Avatar Studio" icon="user-astronaut" href="/percify/avatar-studio">Create & evolve AI avatars.</Card>
+  <Card title="Image → Video" icon="film" href="/percify/image-to-video">Turn stills into dynamic clips.</Card>
+  <Card title="Voice Cloning" icon="microphone" href="/percify/voice-cloning">Generate natural speech.</Card>
+  <Card title="Credit System" icon="coins" href="/percify/credits">Predictable usage-based pricing.</Card>
+  <Card title="API & Auth" icon="key" href="/percify/api-auth">Integrate programmatically.</Card>
+  <Card title="Performance" icon="gauge" href="/percify/performance">Optimized & scalable.</Card>
 </Columns>
 
-## Create beautiful pages
+<Callout emoji="🚀">New here? Start with the Quickstart or jump straight to Avatar Studio.</Callout>
 
-Everything you need to create world-class documentation.
+## Core User Journey
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+1. Sign up & obtain your API key
+2. Purchase / receive starter credits
+3. Generate first avatar (image) → refine → publish
+4. Convert avatar to a short video clip
+5. Add a cloned voice track (optional)
+6. Share or embed using public endpoints
 
-## Need inspiration?
+## Why Credits?
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+Credits provide transparent, tier‑agnostic pricing and enable advanced features like per‑second video scaling, fair voice generation metering, and future tier overrides. See the full breakdown in [/percify/credits].
+
+## Reliability & Safety
+
+Percify implements a ban system, content visibility controls, and rate limiting to keep the platform healthy. Learn more in [/percify/security].
+
+## Architecture at a Glance
+
+<CardGroup cols={2}>
+  <Card title="High-Level Architecture" icon="diagram-project" href="/percify/architecture">Stack, flows, data stores.</Card>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">Endpoints & schemas.</Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">Local + first avatar</Card>
+  <Card title="Avatar Studio" icon="camera" href="/percify/avatar-studio">Studio concepts & UI</Card>
+  <Card title="FAQ" icon="circle-question" href="/percify/faq">Common questions</Card>
+</CardGroup>
+
+## Support
+
+Need help? Reach out via support email or consult troubleshooting in [/percify/faq].
+
