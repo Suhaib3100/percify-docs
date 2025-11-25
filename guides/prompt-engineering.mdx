@@ -1,0 +1,435 @@
+---
+title: "Prompt Engineering Guide"
+description: "Master the art of writing effective prompts for stunning AI avatars"
+---
+
+## Introduction
+
+Prompt engineering is the skill of crafting text descriptions that produce the AI-generated images you envision. This guide teaches you proven techniques to get consistent, high-quality results from Percify's Avatar Studio.
+
+## The Anatomy of a Great Prompt
+
+A well-structured prompt typically includes:
+
+```
+[Subject] + [Style/Medium] + [Details] + [Setting] + [Lighting] + [Quality Modifiers]
+```
+
+### Example Breakdown
+
+**Prompt:** "Elegant elven sorceress, fantasy art style, flowing purple robes with gold trim, mystical forest setting, soft glowing lights, highly detailed, 8k"
+
+- **Subject:** Elegant elven sorceress
+- **Style:** Fantasy art style
+- **Details:** Flowing purple robes with gold trim
+- **Setting:** Mystical forest setting
+- **Lighting:** Soft glowing lights
+- **Quality:** Highly detailed, 8k
+
+## Essential Prompt Components
+
+### 1. Subject (Required)
+
+The main focus of your image. Be specific about:
+
+<Tabs>
+  <Tab title="Character Type">
+    - Profession: warrior, mage, scientist, artist
+    - Species: human, elf, robot, alien
+    - Age: young, middle-aged, elderly
+    - Gender: male, female, androgynous
+  </Tab>
+  
+  <Tab title="Physical Features">
+    - Face: angular, round, sharp features
+    - Hair: long flowing, short spiky, braided
+    - Build: athletic, slender, muscular
+    - Distinctive traits: scars, tattoos, markings
+  </Tab>
+  
+  <Tab title="Expression & Pose">
+    - Emotion: confident, mysterious, joyful, stern
+    - Pose: portrait, action pose, sitting, standing
+    - Gaze: looking at camera, looking away, eyes closed
+  </Tab>
+</Tabs>
+
+### 2. Art Style
+
+Choose an aesthetic that matches your vision:
+
+<CardGroup cols={3}>
+  <Card title="Realistic" icon="image">
+    photorealistic, hyperrealistic, photo, portrait photography, studio photo
+  </Card>
+  <Card title="Digital Art" icon="palette">
+    digital art, digital painting, concept art, artstation trending
+  </Card>
+  <Card title="Illustration" icon="brush">
+    illustration, hand-drawn, sketch, watercolor, oil painting
+  </Card>
+  <Card title="3D Render" icon="cube">
+    3D render, Unreal Engine, Octane render, CGI, Pixar style
+  </Card>
+  <Card title="Anime/Manga" icon="star">
+    anime style, manga, cel shaded, Studio Ghibli, anime portrait
+  </Card>
+  <Card title="Artistic Movements" icon="palette-outline">
+    Art Nouveau, Renaissance, Baroque, Impressionist, Cyberpunk
+  </Card>
+</CardGroup>
+
+### 3. Visual Details
+
+Add specifics to guide the AI:
+
+```
+✅ Good: "wearing futuristic armor with glowing blue accents"
+❌ Vague: "wearing armor"
+
+✅ Good: "long flowing silver hair with braids"
+❌ Vague: "long hair"
+
+✅ Good: "intricate golden crown with ruby gems"
+❌ Vague: "crown"
+```
+
+### 4. Setting & Background
+
+Context matters:
+
+<AccordionGroup>
+  <Accordion icon="city" title="Urban Settings">
+    cyberpunk city, neon lights, futuristic metropolis, urban alley, rooftop view, city street, skyscrapers
+  </Accordion>
+  
+  <Accordion icon="tree" title="Nature Settings">
+    mystical forest, mountain peak, ocean shore, desert landscape, jungle, meadow, waterfall
+  </Accordion>
+  
+  <Accordion icon="building" title="Interior Settings">
+    royal throne room, laboratory, library, bedroom, workshop, spaceship interior, castle hall
+  </Accordion>
+  
+  <Accordion icon="sparkles" title="Fantasy/Sci-Fi">
+    floating islands, alien planet, magical dimension, space station, crystal cavern, ethereal realm
+  </Accordion>
+</AccordionGroup>
+
+### 5. Lighting
+
+Lighting dramatically affects mood:
+
+| Lighting Type | Description | Best For |
+|--------------|-------------|----------|
+| **Soft lighting** | Gentle, diffused | Portraits, peaceful scenes |
+| **Dramatic lighting** | High contrast, shadows | Action, mystery |
+| **Golden hour** | Warm, sunset glow | Romantic, warm scenes |
+| **Rim lighting** | Backlight outline | Epic, heroic |
+| **Neon lighting** | Colorful, electric | Cyberpunk, modern |
+| **Moonlight** | Cool, blue tones | Night, mystical |
+| **Studio lighting** | Clean, professional | Headshots, professional |
+
+### 6. Quality Modifiers
+
+Boost output quality:
+
+```
+highly detailed, 8k, professional, masterpiece, sharp focus,
+intricate details, best quality, award winning, trending on artstation
+```
+
+## Advanced Techniques
+
+### Weighting & Emphasis
+
+Emphasize important parts:
+
+```javascript
+// Mintlify supports emphasis syntax
+"(glowing eyes:1.3) mystical sorceress"  // Strong emphasis on glowing eyes
+"warrior with [leather armor]"           // De-emphasize armor
+```
+
+### Negative Prompts
+
+Exclude unwanted elements:
+
+<CodeGroup>
+
+```text Good Negative Prompts
+blurry, low quality, distorted, deformed, ugly, bad anatomy,
+extra limbs, mutated hands, poorly drawn face, out of frame,
+watermark, text, logo, signature
+```
+
+```text Common Issues to Avoid
+# For faces
+asymmetric eyes, distorted face, extra fingers, missing fingers
+
+# For bodies
+extra arms, extra legs, bad proportions, disconnected limbs
+
+# For overall quality
+pixelated, jpeg artifacts, grainy, noisy, compression artifacts
+```
+
+</CodeGroup>
+
+### Style Mixing
+
+Combine multiple art styles:
+
+```
+"cyberpunk samurai, blend of traditional Japanese art and futuristic neon aesthetic"
+
+"Victorian era portrait in the style of modern digital art"
+
+"anime character with photorealistic rendering"
+```
+
+## Prompt Templates
+
+### Professional Headshots
+
+```
+professional headshot of [description], business attire, 
+confident expression, neutral background, studio lighting, 
+corporate photography, LinkedIn profile photo, sharp focus, 
+high quality, professional photographer
+```
+
+**Example:**
+```
+professional headshot of middle-aged woman with short brown hair,
+business attire, confident smile, neutral gray background,
+studio lighting, corporate photography, sharp focus
+```
+
+### Fantasy Characters
+
+```
+[character type] [race/species], fantasy art style, 
+[detailed appearance], [clothing/armor description],
+[setting], magical atmosphere, [lighting], highly detailed,
+concept art, trending on artstation
+```
+
+**Example:**
+```
+powerful elven mage, fantasy art style, long silver hair,
+ethereal blue eyes, flowing robes with arcane symbols,
+ancient library filled with glowing books, magical atmosphere,
+soft mystical lighting, highly detailed, concept art
+```
+
+### Cyberpunk/Sci-Fi
+
+```
+[character type], cyberpunk style, [tech features],
+neon lights, [city description], futuristic, [lighting],
+blade runner aesthetic, high tech, detailed, 4k
+```
+
+**Example:**
+```
+female hacker, cyberpunk style, augmented reality glasses,
+neon purple and blue lighting, rainy city street with holographic ads,
+futuristic, blade runner aesthetic, highly detailed
+```
+
+### Cartoon/Stylized
+
+```
+[character description], [cartoon style], colorful, 
+friendly expression, [setting], vibrant colors, 
+professional character design, clean lines
+```
+
+**Example:**
+```
+cheerful robot mascot, Pixar animation style, colorful,
+big friendly eyes, tech workshop setting, vibrant blues and oranges,
+professional character design, clean lines
+```
+
+## Model-Specific Tips
+
+### Flux (2 credits - Fast)
+
+- Works best with: Clear, straightforward prompts
+- Optimal length: 20-50 words
+- Strengths: Speed, consistency, general portraits
+- Best for: Testing ideas, iterations, simple concepts
+
+**Example:**
+```
+portrait of young woman, professional photo, natural lighting, smile
+```
+
+### Imagen3 (5 credits - Premium)
+
+- Works best with: Detailed, descriptive prompts
+- Optimal length: 30-80 words
+- Strengths: Photorealism, complex scenes, fine details
+- Best for: Final outputs, professional work, detailed characters
+
+**Example:**
+```
+portrait of young woman with auburn hair and green eyes,
+professional photography, natural window lighting creating soft shadows,
+genuine smile, wearing elegant navy blazer, blurred office background,
+shot with 85mm lens, shallow depth of field, professional headshot
+```
+
+### Reality4 (5 credits - Ultra-Realistic)
+
+- Works best with: Highly specific, technical prompts
+- Optimal length: 40-100 words
+- Strengths: Photorealism, skin textures, lighting accuracy
+- Best for: Commercial work, ultra-realistic renders, product demos
+
+**Example:**
+```
+ultra-realistic portrait of young woman with auburn hair in loose waves,
+striking green eyes with natural eye reflections, fair skin with subtle freckles,
+professional studio photography, softbox lighting with subtle rim light,
+genuine confident smile showing natural teeth, wearing elegant navy blazer,
+perfectly focused on eyes, shot with Canon 5D Mark IV, 85mm f/1.4 lens,
+shallow depth of field, background softly blurred, professional retouching,
+commercial photography quality
+```
+
+## Common Mistakes to Avoid
+
+<AccordionGroup>
+  <Accordion icon="x" title="Being Too Vague">
+    ❌ "a person"
+    ✅ "young female scientist with glasses in a modern laboratory"
+  </Accordion>
+  
+  <Accordion icon="x" title="Overloading with Keywords">
+    ❌ "beautiful gorgeous stunning amazing incredible ultra mega super..."
+    ✅ Pick 2-3 quality modifiers maximum
+  </Accordion>
+  
+  <Accordion icon="x" title="Conflicting Descriptions">
+    ❌ "photorealistic anime cartoon oil painting"
+    ✅ Choose one primary style
+  </Accordion>
+  
+  <Accordion icon="x" title="Forgetting Negative Prompts">
+    Always include basic quality excludes in negative prompt
+  </Accordion>
+  
+  <Accordion icon="x" title="Too Many Subjects">
+    ❌ "warrior, mage, dragon, castle, forest, and a robot"
+    ✅ Focus on one or two main subjects
+  </Accordion>
+</AccordionGroup>
+
+## Iterative Refinement
+
+Perfect prompts come from iteration:
+
+<Steps>
+  <Step title="Start Simple">
+    Begin with a basic prompt describing your core vision
+  </Step>
+  
+  <Step title="Generate and Evaluate">
+    See what the AI produces and note what's missing or wrong
+  </Step>
+  
+  <Step title="Add Details">
+    Add specific details for elements that need improvement
+  </Step>
+  
+  <Step title="Use Negative Prompts">
+    Exclude unwanted elements that appeared
+  </Step>
+  
+  <Step title="Refine Quality">
+    Add quality modifiers and lighting details
+  </Step>
+  
+  <Step title="Lock with Seeds">
+    Use the same seed with prompt variations to compare results
+  </Step>
+</Steps>
+
+## Prompt Library
+
+Save these proven prompts:
+
+### Corporate Professional
+
+```
+professional business portrait of [description], wearing formal attire,
+confident posture, neutral gray background, studio lighting with soft shadows,
+corporate photography style, shot with 85mm lens, sharp focus on face,
+professional retouching, LinkedIn profile quality, 4k resolution
+```
+
+### Fantasy Hero
+
+```
+epic portrait of [hero type], fantasy art, detailed armor with intricate engravings,
+heroic pose, dramatic lighting with rim light, mystical background,
+concept art style, trending on artstation, highly detailed, 8k,
+cinematic composition, professional digital art
+```
+
+### Friendly Character
+
+```
+friendly [character type], Pixar animation style, big expressive eyes,
+warm smile, colorful and vibrant, simple background with soft gradient,
+professional character design, clean vector style, appealing to all ages,
+animation ready, high quality render
+```
+
+### Mysterious Figure
+
+```
+mysterious [character type], dramatic portrait, face partially in shadow,
+moody atmosphere, dark background with selective lighting, cinematic,
+film noir style, high contrast, professional photography,
+shallow depth of field, enigmatic expression
+```
+
+## Testing Your Prompts
+
+Use this checklist:
+
+- [ ] Clear subject definition
+- [ ] Art style specified
+- [ ] Important details included
+- [ ] Setting/background described
+- [ ] Lighting mentioned
+- [ ] Quality modifiers added
+- [ ] Negative prompt included
+- [ ] No conflicting descriptions
+- [ ] Reasonable length (20-100 words)
+- [ ] Tested with appropriate model
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="Avatar Studio" icon="palette" href="/percify/avatar-studio">
+    Try your prompts
+  </Card>
+  <Card title="Community Gallery" icon="images" href="https://percify.io/gallery">
+    See prompts from other creators
+  </Card>
+  <Card title="Discord" icon="discord" href="https://discord.gg/percify">
+    Share and discuss prompts
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/avatars/generate">
+    Programmatic generation
+  </Card>
+</CardGroup>
+
+---
+
+**Ready to craft the perfect prompt?** Open [Avatar Studio](https://percify.io/avatar-studio) and start creating!

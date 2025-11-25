@@ -51,6 +51,15 @@
               "api-reference/introduction",
               "percify/api-auth"
             ]
+          },
+          {
+            "group": "Guides & Tutorials",
+            "pages": [
+              "guides/getting-started",
+              "guides/prompt-engineering",
+              "guides/sdk-integration",
+              "guides/webhooks"
+            ]
           }
         ]
       },
@@ -58,12 +67,36 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "Endpoints",
+            "group": "Getting Started",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/introduction",
+              "percify/api-auth"
+            ]
+          },
+          {
+            "group": "Avatar API",
+            "pages": [
+              "api-reference/avatars/overview",
+              "api-reference/avatars/generate",
+              "api-reference/avatars/list"
+            ]
+          },
+          {
+            "group": "Video Studio API",
+            "pages": [
+              "api-reference/video-studio/overview"
+            ]
+          },
+          {
+            "group": "Audio & Voice API",
+            "pages": [
+              "api-reference/audio/overview"
+            ]
+          },
+          {
+            "group": "User & Credits API",
+            "pages": [
+              "api-reference/user/overview"
             ]
           }
         ]

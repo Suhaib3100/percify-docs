@@ -1,0 +1,650 @@
+---
+title: "SDK & Integration Guide"
+description: "Integrate Percify into your applications with SDKs and examples"
+---
+
+## Overview
+
+Percify provides multiple ways to integrate AI avatar generation into your applications. This guide covers official SDKs, REST API integration, and common use cases.
+
+## Official SDKs
+
+<CardGroup cols={3}>
+  <Card title="JavaScript/Node.js" icon="node-js">
+    NPM package for Node.js and browser
+  </Card>
+  <Card title="Python" icon="python">
+    PyPI package with async support
+  </Card>
+  <Card title="REST API" icon="globe">
+    Direct HTTP API for any language
+  </Card>
+</CardGroup>
+
+## JavaScript/Node.js SDK
+
+### Installation
+
+```bash
+npm install @percify/sdk
+# or
+yarn add @percify/sdk
+```
+
+### Quick Start
+
+```javascript
+import { Percify } from '@percify/sdk';
+
+const percify = new Percify({
+  apiKey: process.env.PERCIFY_API_KEY
+});
+
+// Generate avatar
+const avatar = await percify.avatars.generate({
+  prompt: 'cyberpunk warrior, neon city background',
+  model: 'flux'
+});
+
+console.log(`Avatar created: ${avatar.imageUrl}`);
+```
+
+### Complete Example
+
+```javascript
+import { Percify } from '@percify/sdk';
+
+const client = new Percify({
+  apiKey: process.env.PERCIFY_API_KEY,
+  timeout: 60000, // 60 seconds
+  retries: 3
+});
+
+async function createAvatarWorkflow() {
+  try {
+    // 1. Generate avatar
+    console.log('Generating avatar...');
+    const avatar = await client.avatars.generate({
+      prompt: 'mystical forest guardian, glowing eyes, fantasy art',
+      model: 'imagen3',
+      aspectRatio: '1:1',
+      negativePrompt: 'blurry, low quality'
+    });
+    
+    // Wait for completion
+    const completedAvatar = await client.avatars.waitForCompletion(avatar.id);
+    console.log(`Avatar ready: ${completedAvatar.imageUrl}`);
+    
+    // 2. Convert to video
+    console.log('Creating video...');
+    const video = await client.videos.fromImage({
+      imageId: avatar.id,
+      durationSeconds: 5,
+      studioTier: 'basic',
+      motionStyle: 'moderate'
+    });
+    
+    // Wait for video completion
+    const completedVideo = await client.videos.waitForCompletion(video.id);
+    console.log(`Video ready: ${completedVideo.videoUrl}`);
+    
+    // 3. Clone voice and add audio
+    console.log('Cloning voice...');
+    const voice = await client.voices.clone({
+      audioFile: './voice-sample.mp3',
+      name: 'My Voice'
+    });
+    
+    // Generate speech
+    const audio = await client.audio.generate({
+      text: 'Welcome to the mystical forest!',
+      voiceId: voice.id
+    });
+    
+    // Add audio to video
+    const finalVideo = await client.videos.addAudio({
+      videoId: video.id,
+      audioId: audio.id,
+      enableLipSync: true
+    });
+    
+    console.log(`Complete video: ${finalVideo.videoUrl}`);
+    
+    return {
+      avatar: completedAvatar,
+      video: finalVideo
+    };
+    
+  } catch (error) {
+    console.error('Error:', error.message);
+    throw error;
+  }
+}
+
+createAvatarWorkflow();
+```
+
+### Error Handling
+
+```javascript
+import { Percify, PercifyError, InsufficientCreditsError } from '@percify/sdk';
+
+const client = new Percify({ apiKey: process.env.PERCIFY_API_KEY });
+
+try {
+  const avatar = await client.avatars.generate({
+    prompt: 'warrior character',
+    model: 'imagen3'
+  });
+} catch (error) {
+  if (error instanceof InsufficientCreditsError) {
+    console.log('Not enough credits. Please purchase more.');
+    console.log(`Required: ${error.required}, Available: ${error.available}`);
+  } else if (error instanceof PercifyError) {
+    console.log(`API Error: ${error.code} - ${error.message}`);
+  } else {
+    console.log('Unexpected error:', error);
+  }
+}
+```
+
+### Webhooks Integration
+
+```javascript
+import express from 'express';
+import { Percify } from '@percify/sdk';
+
+const app = express();
+app.use(express.json());
+
+const client = new Percify({ apiKey: process.env.PERCIFY_API_KEY });
+
+// Webhook endpoint
+app.post('/webhooks/percify', async (req, res) => {
+  const signature = req.headers['x-percify-signature'];
+  
+  // Verify webhook signature
+  if (!client.webhooks.verify(req.body, signature)) {
+    return res.status(401).send('Invalid signature');
+  }
+  
+  const event = req.body;
+  
+  switch (event.type) {
+    case 'avatar.completed':
+      console.log(`Avatar ${event.data.avatarId} completed`);
+      // Process completed avatar
+      break;
+      
+    case 'video.completed':
+      console.log(`Video ${event.data.videoId} ready`);
+      // Download or process video
+      break;
+      
+    case 'credits.low_balance':
+      console.log(`Low balance: ${event.data.balance} credits`);
+      // Send notification to user
+      break;
+  }
+  
+  res.sendStatus(200);
+});
+
+app.listen(3000);
+```
+
+## Python SDK
+
+### Installation
+
+```bash
+pip install percify
+```
+
+### Quick Start
+
+```python
+from percify import Percify
+import os
+
+client = Percify(api_key=os.environ['PERCIFY_API_KEY'])
+
+# Generate avatar
+avatar = client.avatars.generate(
+    prompt='cyberpunk warrior, neon city background',
+    model='flux'
+)
+
+print(f"Avatar created: {avatar.image_url}")
+```
+
+### Complete Example
+
+```python
+import os
+import asyncio
+from percify import Percify
+from percify.exceptions import InsufficientCreditsError, PercifyError
+
+client = Percify(api_key=os.environ['PERCIFY_API_KEY'])
+
+async def create_avatar_workflow():
+    try:
+        # 1. Generate avatar
+        print('Generating avatar...')
+        avatar = await client.avatars.generate_async(
+            prompt='mystical forest guardian, glowing eyes, fantasy art',
+            model='imagen3',
+            aspect_ratio='1:1',
+            negative_prompt='blurry, low quality'
+        )
+        
+        # Wait for completion
+        avatar = await client.avatars.wait_for_completion(avatar.id)
+        print(f"Avatar ready: {avatar.image_url}")
+        
+        # 2. Convert to video
+        print('Creating video...')
+        video = await client.videos.from_image_async(
+            image_id=avatar.id,
+            duration_seconds=5,
+            studio_tier='basic',
+            motion_style='moderate'
+        )
+        
+        # Wait for video completion
+        video = await client.videos.wait_for_completion(video.id)
+        print(f"Video ready: {video.video_url}")
+        
+        # 3. Clone voice and generate audio
+        print('Cloning voice...')
+        with open('voice-sample.mp3', 'rb') as f:
+            voice = await client.voices.clone_async(
+                audio=f,
+                name='My Voice'
+            )
+        
+        # Generate speech
+        audio = await client.audio.generate_async(
+            text='Welcome to the mystical forest!',
+            voice_id=voice.id
+        )
+        
+        # Add audio to video
+        final_video = await client.videos.add_audio_async(
+            video_id=video.id,
+            audio_id=audio.id,
+            enable_lip_sync=True
+        )
+        
+        print(f"Complete video: {final_video.video_url}")
+        
+        return {
+            'avatar': avatar,
+            'video': final_video
+        }
+        
+    except InsufficientCreditsError as e:
+        print(f'Not enough credits. Required: {e.required}, Available: {e.available}')
+    except PercifyError as e:
+        print(f'API Error: {e.code} - {e.message}')
+    except Exception as e:
+        print(f'Unexpected error: {e}')
+
+# Run async workflow
+asyncio.run(create_avatar_workflow())
+```
+
+### Flask Webhook Integration
+
+```python
+from flask import Flask, request, jsonify
+from percify import Percify
+import os
+
+app = Flask(__name__)
+client = Percify(api_key=os.environ['PERCIFY_API_KEY'])
+
+@app.route('/webhooks/percify', methods=['POST'])
+def webhook():
+    signature = request.headers.get('X-Percify-Signature')
+    
+    # Verify webhook signature
+    if not client.webhooks.verify(request.get_data(), signature):
+        return 'Invalid signature', 401
+    
+    event = request.get_json()
+    
+    if event['type'] == 'avatar.completed':
+        print(f"Avatar {event['data']['avatarId']} completed")
+        # Process completed avatar
+        
+    elif event['type'] == 'video.completed':
+        print(f"Video {event['data']['videoId']} ready")
+        # Download or process video
+        
+    elif event['type'] == 'credits.low_balance':
+        print(f"Low balance: {event['data']['balance']} credits")
+        # Send notification
+    
+    return jsonify({'status': 'received'}), 200
+
+if __name__ == '__main__':
+    app.run(port=3000)
+```
+
+## REST API Integration
+
+For languages without an official SDK, use the REST API directly:
+
+### cURL Examples
+
+```bash
+# Generate avatar
+curl -X POST https://api.percify.io/v1/avatars/generate \
+  -H "Authorization: Bearer $PERCIFY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "cyberpunk warrior",
+    "model": "flux"
+  }'
+
+# Check status
+curl -X GET https://api.percify.io/v1/avatars/avatar_123 \
+  -H "Authorization: Bearer $PERCIFY_API_KEY"
+
+# Generate video
+curl -X POST https://api.percify.io/v1/videos/from-image \
+  -H "Authorization: Bearer $PERCIFY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "imageId": "avatar_123",
+    "durationSeconds": 5
+  }'
+```
+
+### PHP Example
+
+```php
+<?php
+
+function generateAvatar($apiKey, $prompt, $model = 'flux') {
+    $url = 'https://api.percify.io/v1/avatars/generate';
+    
+    $data = [
+        'prompt' => $prompt,
+        'model' => $model
+    ];
+    
+    $options = [
+        'http' => [
+            'header' => [
+                "Authorization: Bearer $apiKey",
+                'Content-Type: application/json'
+            ],
+            'method' => 'POST',
+            'content' => json_encode($data)
+        ]
+    ];
+    
+    $context = stream_context_create($options);
+    $result = file_get_contents($url, false, $context);
+    
+    return json_decode($result, true);
+}
+
+$apiKey = getenv('PERCIFY_API_KEY');
+$avatar = generateAvatar($apiKey, 'mystical wizard, fantasy art');
+
+echo "Avatar ID: " . $avatar['id'] . "\n";
+echo "Status: " . $avatar['status'] . "\n";
+?>
+```
+
+### Ruby Example
+
+```ruby
+require 'net/http'
+require 'json'
+require 'uri'
+
+class PercifyClient
+  def initialize(api_key)
+    @api_key = api_key
+    @base_url = 'https://api.percify.io/v1'
+  end
+  
+  def generate_avatar(prompt, model: 'flux')
+    uri = URI("#{@base_url}/avatars/generate")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    
+    request = Net::HTTP::Post.new(uri.path)
+    request['Authorization'] = "Bearer #{@api_key}"
+    request['Content-Type'] = 'application/json'
+    request.body = {
+      prompt: prompt,
+      model: model
+    }.to_json
+    
+    response = http.request(request)
+    JSON.parse(response.body)
+  end
+end
+
+client = PercifyClient.new(ENV['PERCIFY_API_KEY'])
+avatar = client.generate_avatar('cyberpunk warrior, neon city')
+
+puts "Avatar ID: #{avatar['id']}"
+puts "Status: #{avatar['status']}"
+```
+
+## Common Integration Patterns
+
+### Batch Processing
+
+```javascript
+// Process multiple avatars in parallel
+async function batchGenerate(prompts) {
+  const promises = prompts.map(prompt =>
+    client.avatars.generate({ prompt, model: 'flux' })
+  );
+  
+  const avatars = await Promise.all(promises);
+  
+  // Wait for all to complete
+  const completed = await Promise.all(
+    avatars.map(a => client.avatars.waitForCompletion(a.id))
+  );
+  
+  return completed;
+}
+
+const prompts = [
+  'warrior character',
+  'mage character',
+  'rogue character'
+];
+
+const avatars = await batchGenerate(prompts);
+```
+
+### Queue System
+
+```javascript
+import Queue from 'bull';
+
+const avatarQueue = new Queue('avatar-generation', {
+  redis: { host: 'localhost', port: 6379 }
+});
+
+// Add job
+avatarQueue.add({
+  prompt: 'fantasy character',
+  userId: 'user_123'
+});
+
+// Process job
+avatarQueue.process(async (job) => {
+  const { prompt, userId } = job.data;
+  
+  const avatar = await client.avatars.generate({ prompt });
+  const completed = await client.avatars.waitForCompletion(avatar.id);
+  
+  // Save to database or notify user
+  await saveAvatarForUser(userId, completed);
+  
+  return completed;
+});
+```
+
+### Retry Logic
+
+```javascript
+async function generateWithRetry(prompt, maxRetries = 3) {
+  let lastError;
+  
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const avatar = await client.avatars.generate({ prompt });
+      return await client.avatars.waitForCompletion(avatar.id);
+    } catch (error) {
+      lastError = error;
+      
+      if (error instanceof InsufficientCreditsError) {
+        throw error; // Don't retry
+      }
+      
+      // Wait before retry (exponential backoff)
+      await new Promise(resolve => 
+        setTimeout(resolve, Math.pow(2, i) * 1000)
+      );
+    }
+  }
+  
+  throw lastError;
+}
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion icon="key" title="Secure API Keys">
+    - Store in environment variables
+    - Never commit to version control
+    - Use different keys for dev/prod
+    - Rotate regularly
+    - Implement key scoping if available
+  </Accordion>
+  
+  <Accordion icon="clock" title="Handle Timeouts">
+    ```javascript
+    const client = new Percify({
+      apiKey: process.env.PERCIFY_API_KEY,
+      timeout: 60000, // 60 seconds
+      retries: 3,
+      retryDelay: 1000
+    });
+    ```
+  </Accordion>
+  
+  <Accordion icon="bell" title="Use Webhooks for Long Operations">
+    Instead of polling:
+    ```javascript
+    // ❌ Polling
+    while (status !== 'completed') {
+      await sleep(5000);
+      status = await checkStatus();
+    }
+    
+    // ✅ Webhooks
+    await client.videos.generate({ imageId, webhookUrl });
+    // Webhook notifies when complete
+    ```
+  </Accordion>
+  
+  <Accordion icon="gauge" title="Monitor Usage">
+    ```javascript
+    // Check credits before expensive operations
+    const credits = await client.user.getCredits();
+    if (credits.balance < 50) {
+      console.warn('Low credits!');
+    }
+    
+    // Track usage
+    const usage = await client.user.getUsage({ period: '30d' });
+    console.log(`Credits spent: ${usage.totalCreditsSpent}`);
+    ```
+  </Accordion>
+  
+  <Accordion icon="shield" title="Validate User Input">
+    ```javascript
+    function validatePrompt(prompt) {
+      if (!prompt || prompt.length < 3) {
+        throw new Error('Prompt too short');
+      }
+      if (prompt.length > 500) {
+        throw new Error('Prompt too long');
+      }
+      // Check for prohibited content
+      // ...
+      return true;
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Deployment Considerations
+
+### Environment Variables
+
+```.env
+PERCIFY_API_KEY=your_api_key_here
+PERCIFY_WEBHOOK_SECRET=your_webhook_secret
+PERCIFY_TIMEOUT=60000
+PERCIFY_MAX_RETRIES=3
+```
+
+### Rate Limiting
+
+```javascript
+import rateLimit from 'express-rate-limit';
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10 // 10 requests per minute
+});
+
+app.use('/api/generate', limiter);
+```
+
+### Caching
+
+```javascript
+import NodeCache from 'node-cache';
+
+const cache = new NodeCache({ stdTTL: 3600 }); // 1 hour
+
+async function getCachedAvatar(avatarId) {
+  const cached = cache.get(avatarId);
+  if (cached) return cached;
+  
+  const avatar = await client.avatars.get(avatarId);
+  cache.set(avatarId, avatar);
+  return avatar;
+}
+```
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Complete API documentation
+  </Card>
+  <Card title="Examples" icon="book" href="https://github.com/percify/examples">
+    Code examples repository
+  </Card>
+  <Card title="Support" icon="life-ring" href="mailto:support@percify.io">
+    Get integration help
+  </Card>
+</CardGroup>
