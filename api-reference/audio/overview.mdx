@@ -1,0 +1,430 @@
+---
+title: "Audio & Voice API Overview"
+description: "Clone voices and generate natural speech with multi-language support"
+---
+
+## Overview
+
+The Audio API provides voice cloning and text-to-speech capabilities. Clone voices from audio samples and generate natural-sounding speech in 30+ languages. Perfect for voiceovers, audiobooks, virtual assistants, and character dialogue.
+
+## Base URL
+
+```
+https://api.percify.io/v1
+```
+
+## Core Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/voices/clone` | Clone voice from audio sample |
+| GET | `/voices` | List your voice clones |
+| GET | `/voices/{voiceId}` | Get voice clone details |
+| DELETE | `/voices/{voiceId}` | Delete voice clone |
+| POST | `/audio/generate` | Generate speech from text |
+| GET | `/audio/{audioId}` | Get audio generation status |
+| GET | `/audio` | List generated audio files |
+
+## Voice Clone Object
+
+```json
+{
+  "id": "voice_abc123",
+  "userId": "user_xyz789",
+  "name": "My Custom Voice",
+  "language": "en-US",
+  "status": "completed",
+  "sampleUrl": "https://cdn.percify.io/voices/voice_abc123_sample.mp3",
+  "sampleDuration": 45.3,
+  "quality": "high",
+  "creditCost": 5,
+  "metadata": {
+    "pitch": "medium",
+    "pace": "normal",
+    "emotion": "neutral"
+  },
+  "createdAt": "2025-11-25T06:20:00Z"
+}
+```
+
+## Audio Generation Object
+
+```json
+{
+  "id": "audio_def456",
+  "userId": "user_xyz789",
+  "voiceId": "voice_abc123",
+  "text": "Welcome to Percify! Your AI-powered creative platform.",
+  "status": "completed",
+  "audioUrl": "https://cdn.percify.io/audio/audio_def456.mp3",
+  "durationSeconds": 5.2,
+  "format": "mp3",
+  "sampleRate": 44100,
+  "bitrate": 192,
+  "creditCost": 10,
+  "language": "en-US",
+  "metadata": {
+    "speed": 1.0,
+    "pitch": 0,
+    "emotion": "neutral"
+  },
+  "createdAt": "2025-11-25T06:25:00Z",
+  "completedAt": "2025-11-25T06:25:03Z"
+}
+```
+
+## Pricing
+
+### Voice Cloning
+- **Cost:** 5 credits per voice clone (one-time)
+- **Reusable:** Generate unlimited audio with same voice ID
+
+### Audio Generation
+- **Base:** 5 credits
+- **Duration:** +1 credit per second
+- **Formula:** `Total = 5 + (duration_seconds × 1)`
+
+### Examples
+
+| Duration | Calculation | Total Credits |
+|----------|-------------|---------------|
+| 5s | 5 + (5 × 1) | 10 |
+| 15s | 5 + (15 × 1) | 20 |
+| 60s | 5 + (60 × 1) | 65 |
+| 2min | 5 + (120 × 1) | 125 |
+
+## Quick Start
+
+### Clone a Voice
+
+<CodeGroup>
+
+```javascript Node.js
+const fs = require('fs');
+const FormData = require('form-data');
+
+const form = new FormData();
+form.append('audio', fs.createReadStream('voice-sample.wav'));
+form.append('name', 'Professional Narrator');
+form.append('language', 'en-US');
+
+const response = await fetch('https://api.percify.io/v1/voices/clone', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${process.env.PERCIFY_API_KEY}`,
+    ...form.getHeaders()
+  },
+  body: form
+});
+
+const voice = await response.json();
+console.log(`Voice ID: ${voice.id}`);
+```
+
+```python Python
+import os
+import requests
+
+with open('voice-sample.wav', 'rb') as audio_file:
+    files = {'audio': audio_file}
+    data = {
+        'name': 'Professional Narrator',
+        'language': 'en-US'
+    }
+    
+    response = requests.post(
+        'https://api.percify.io/v1/voices/clone',
+        headers={'Authorization': f'Bearer {os.environ["PERCIFY_API_KEY"]}'},
+        files=files,
+        data=data
+    )
+    
+    voice = response.json()
+    print(f"Voice ID: {voice['id']}")
+```
+
+```bash cURL
+curl -X POST https://api.percify.io/v1/voices/clone \
+  -H "Authorization: Bearer $PERCIFY_API_KEY" \
+  -F "audio=@voice-sample.wav" \
+  -F "name=Professional Narrator" \
+  -F "language=en-US"
+```
+
+</CodeGroup>
+
+### Generate Speech
+
+<CodeGroup>
+
+```javascript Node.js
+const response = await fetch('https://api.percify.io/v1/audio/generate', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${process.env.PERCIFY_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    text: 'Welcome to Percify! Your AI-powered creative platform.',
+    voiceId: 'voice_abc123',
+    speed: 1.0,
+    outputFormat: 'mp3'
+  })
+});
+
+const audio = await response.json();
+console.log(`Audio URL: ${audio.audioUrl}`);
+```
+
+```python Python
+import os
+import requests
+
+response = requests.post(
+    'https://api.percify.io/v1/audio/generate',
+    headers={
+        'Authorization': f'Bearer {os.environ["PERCIFY_API_KEY"]}',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'text': 'Welcome to Percify! Your AI-powered creative platform.',
+        'voiceId': 'voice_abc123',
+        'speed': 1.0,
+        'outputFormat': 'mp3'
+    }
+)
+
+audio = response.json()
+print(f"Audio URL: {audio['audioUrl']}")
+```
+
+```bash cURL
+curl -X POST https://api.percify.io/v1/audio/generate \
+  -H "Authorization: Bearer $PERCIFY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Welcome to Percify! Your AI-powered creative platform.",
+    "voiceId": "voice_abc123",
+    "speed": 1.0,
+    "outputFormat": "mp3"
+  }'
+```
+
+</CodeGroup>
+
+## Supported Languages
+
+<Tabs>
+  <Tab title="English">
+    - `en-US` - American English
+    - `en-GB` - British English
+    - `en-AU` - Australian English
+    - `en-CA` - Canadian English
+    - `en-IN` - Indian English
+  </Tab>
+  
+  <Tab title="European">
+    - `es-ES` - Spanish (Spain)
+    - `es-MX` - Spanish (Mexico)
+    - `fr-FR` - French
+    - `de-DE` - German
+    - `it-IT` - Italian
+    - `pt-PT` - Portuguese (Portugal)
+    - `pt-BR` - Portuguese (Brazil)
+    - `pl-PL` - Polish
+    - `nl-NL` - Dutch
+    - `ru-RU` - Russian
+  </Tab>
+  
+  <Tab title="Asian">
+    - `zh-CN` - Mandarin (Simplified)
+    - `zh-TW` - Mandarin (Traditional)
+    - `ja-JP` - Japanese
+    - `ko-KR` - Korean
+    - `hi-IN` - Hindi
+    - `th-TH` - Thai
+    - `vi-VN` - Vietnamese
+    - `id-ID` - Indonesian
+  </Tab>
+  
+  <Tab title="Other">
+    - `ar-SA` - Arabic
+    - `tr-TR` - Turkish
+    - `sv-SE` - Swedish
+    - `da-DK` - Danish
+    - `no-NO` - Norwegian
+    - `fi-FI` - Finnish
+  </Tab>
+</Tabs>
+
+## Preset Voices
+
+Use built-in voices without cloning:
+
+| Voice ID | Description | Languages |
+|----------|-------------|-----------|
+| `preset-professional-male` | Deep, authoritative | All supported |
+| `preset-professional-female` | Clear, confident | All supported |
+| `preset-friendly-male` | Warm, approachable | All supported |
+| `preset-friendly-female` | Upbeat, energetic | All supported |
+| `preset-narrator` | Storytelling style | All supported |
+
+## Voice Modulation
+
+Control speech characteristics:
+
+```javascript
+const audio = await client.audio.generate({
+  text: 'This is an exciting announcement!',
+  voiceId: 'voice_abc123',
+  
+  // Speed control
+  speed: 1.1,              // 0.5 to 2.0 (1.0 = normal)
+  
+  // Pitch control
+  pitch: 2,                // -10 to +10 semitones
+  
+  // Emotion
+  emotion: 'excited',      // neutral, happy, sad, excited, calm
+  
+  // Emphasis
+  emphasis: ['exciting', 'announcement'],
+  
+  // Output format
+  outputFormat: 'mp3',     // mp3, wav, ogg
+  sampleRate: 44100,       // 22050, 44100, 48000
+  bitrate: 192             // kbps for mp3
+});
+```
+
+## Audio Quality Options
+
+### Output Formats
+
+| Format | Codec | Use Case | File Size |
+|--------|-------|----------|-----------|
+| MP3 | MPEG Audio Layer 3 | Web, streaming, general use | Small |
+| WAV | Uncompressed PCM | Professional editing, highest quality | Large |
+| OGG | Ogg Vorbis | Open format, web embedding | Medium |
+
+### Sample Rates
+
+- **22050 Hz:** Voice-only, minimal quality
+- **44100 Hz:** CD quality, recommended for most uses
+- **48000 Hz:** Professional audio, broadcast quality
+
+## SSML Support
+
+Use Speech Synthesis Markup Language for fine control:
+
+```xml
+<speak>
+  <prosody rate="slow" pitch="+2st">
+    Welcome to Percify!
+  </prosody>
+  <break time="500ms"/>
+  <emphasis level="strong">Create amazing content</emphasis>
+  with our AI-powered tools.
+  <break time="300ms"/>
+  <prosody rate="fast">Let's get started!</prosody>
+</speak>
+```
+
+```javascript
+const audio = await client.audio.generate({
+  text: ssmlContent,
+  voiceId: 'voice_abc123',
+  textFormat: 'ssml'
+});
+```
+
+## Error Responses
+
+```json
+{
+  "error": {
+    "code": "invalid_audio_sample",
+    "message": "Audio sample too short. Minimum 15 seconds required.",
+    "details": {
+      "duration": 8.3,
+      "minimum": 15,
+      "recommended": 30
+    }
+  }
+}
+```
+
+Common error codes:
+- `invalid_audio_sample` - Poor quality or too short
+- `unsupported_language` - Language not available
+- `text_too_long` - Exceeds maximum length (10,000 chars)
+- `voice_not_found` - Voice ID doesn't exist
+- `insufficient_credits` - Not enough credits
+
+## Rate Limits
+
+| Tier | Voice Cloning | Audio Generation | Concurrent |
+|------|--------------|------------------|------------|
+| Free | 5/day | 100/day | 2 |
+| Pro | 50/day | 1000/day | 5 |
+| Enterprise | Unlimited | Unlimited | 20 |
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion icon="microphone" title="Recording Quality">
+    For best voice cloning results:
+    - Use clean, noise-free environment
+    - 15-60 seconds of clear speech
+    - Professional microphone recommended
+    - Sample rate: 44.1kHz or higher
+    - Format: WAV, MP3, or FLAC
+  </Accordion>
+  
+  <Accordion icon="text" title="Text Optimization">
+    - Keep sentences natural and conversational
+    - Use punctuation for proper pauses
+    - Break long text into smaller chunks
+    - Specify pronunciation for technical terms
+    - Test with short samples first
+  </Accordion>
+  
+  <Accordion icon="shield" title="Content Policy">
+    - Only clone voices you have permission to use
+    - Don't impersonate without consent
+    - Clearly disclose AI-generated content
+    - Comply with local voice biometric laws
+  </Accordion>
+</AccordionGroup>
+
+## Webhooks
+
+Subscribe to audio completion events:
+
+```json
+{
+  "event": "audio.completed",
+  "data": {
+    "audioId": "audio_def456",
+    "voiceId": "voice_abc123",
+    "audioUrl": "https://cdn.percify.io/audio/audio_def456.mp3",
+    "durationSeconds": 5.2,
+    "creditCost": 10
+  },
+  "timestamp": "2025-11-25T06:25:03Z"
+}
+```
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Clone Voice" icon="clone" href="/api-reference/audio/clone-voice">
+    Create voice profiles
+  </Card>
+  <Card title="Generate Speech" icon="volume" href="/api-reference/audio/generate">
+    Text-to-speech
+  </Card>
+  <Card title="Add to Video" icon="film" href="/api-reference/video-studio/add-audio">
+    Sync with video
+  </Card>
+</CardGroup>
