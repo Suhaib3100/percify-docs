@@ -1,0 +1,373 @@
+---
+title: "Getting Started with Percify"
+description: "Complete beginner's guide to creating your first AI avatar, video, and voice content"
+---
+
+## Welcome to Percify!
+
+This guide will walk you through everything you need to know to start creating amazing AI-powered content with Percify. In just 15 minutes, you'll:
+
+- ✅ Set up your account and API access
+- ✅ Generate your first AI avatar
+- ✅ Convert it to an animated video
+- ✅ Add a voice track
+- ✅ Understand credits and pricing
+- ✅ Explore the community
+
+## Step 1: Create Your Account
+
+<Steps>
+  <Step title="Sign Up">
+    Visit [percify.io](https://percify.io) and click "Sign Up"
+    
+    You can sign up with:
+    - Email and password
+    - Google account
+    - GitHub account
+  </Step>
+  
+  <Step title="Verify Email">
+    Check your inbox for a verification email and click the confirmation link
+  </Step>
+  
+  <Step title="Claim Starter Credits">
+    New users receive **50 free credits** to explore all features!
+    
+    This is enough to:
+    - Generate 10-25 avatars (Flux model)
+    - Create 1-2 short videos
+    - Clone 10 voices
+    - Try all premium features
+  </Step>
+</Steps>
+
+## Step 2: Get Your API Key
+
+<Info>
+API keys are optional if you only want to use the web dashboard. Skip to Step 3 if you're just getting started with the UI.
+</Info>
+
+For programmatic access:
+
+<Steps>
+  <Step title="Navigate to Settings">
+    Click your profile icon → Settings → API Keys
+  </Step>
+  
+  <Step title="Create API Key">
+    Click "Create New Key" and give it a descriptive name like "My First App"
+  </Step>
+  
+  <Step title="Copy and Store Securely">
+    ```bash
+    # Store in environment variable
+    export PERCIFY_API_KEY="your_api_key_here"
+    
+    # Or in .env file
+    echo "PERCIFY_API_KEY=your_api_key_here" >> .env
+    ```
+    
+    <Warning>
+    Keep your API key secret! Never commit it to version control or share it publicly.
+    </Warning>
+  </Step>
+</Steps>
+
+## Step 3: Generate Your First Avatar
+
+### Via Web Dashboard
+
+<Steps>
+  <Step title="Open Avatar Studio">
+    From the dashboard, click "Avatar Studio" or the big "Create Avatar" button
+  </Step>
+  
+  <Step title="Write Your Prompt">
+    Describe what you want to create. Be specific!
+    
+    **Good examples:**
+    - "cyberpunk warrior with neon armor, city background, dramatic lighting"
+    - "friendly robot character, cartoon style, colorful"
+    - "professional business portrait, confident smile, office background"
+    
+    **Tips:**
+    - Include: subject, style, setting, mood, lighting
+    - Be descriptive but concise (1-2 sentences)
+    - Use negative prompts to exclude unwanted elements
+  </Step>
+  
+  <Step title="Choose Settings">
+    - **Model:** Start with "Flux" (2 credits, fast)
+    - **Aspect Ratio:** 1:1 for profile pictures, 16:9 for videos
+    - **Style Preset:** Try "Professional" or "Cyberpunk"
+  </Step>
+  
+  <Step title="Generate">
+    Click "Generate" and wait 3-5 seconds
+    
+    Your avatar will appear in the preview. If you like it, great! If not, adjust your prompt and try again.
+  </Step>
+</Steps>
+
+### Via API
+
+<CodeGroup>
+
+```javascript Node.js
+const fetch = require('node-fetch');
+
+async function createAvatar() {
+  const response = await fetch('https://api.percify.io/v1/avatars/generate', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.PERCIFY_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      prompt: 'mystical wizard with glowing staff, fantasy art style',
+      model: 'flux',
+      aspectRatio: '1:1'
+    })
+  });
+  
+  const avatar = await response.json();
+  console.log('Avatar created:', avatar.id);
+  console.log('Image URL:', avatar.imageUrl);
+  
+  return avatar;
+}
+
+createAvatar();
+```
+
+```python Python
+import os
+import requests
+
+def create_avatar():
+    response = requests.post(
+        'https://api.percify.io/v1/avatars/generate',
+        headers={
+            'Authorization': f'Bearer {os.environ["PERCIFY_API_KEY"]}',
+            'Content-Type': 'application/json'
+        },
+        json={
+            'prompt': 'mystical wizard with glowing staff, fantasy art style',
+            'model': 'flux',
+            'aspectRatio': '1:1'
+        }
+    )
+    
+    avatar = response.json()
+    print(f"Avatar created: {avatar['id']}")
+    print(f"Image URL: {avatar['imageUrl']}")
+    
+    return avatar
+
+create_avatar()
+```
+
+</CodeGroup>
+
+## Step 4: Convert to Video
+
+<Steps>
+  <Step title="Select Your Avatar">
+    In the dashboard, find the avatar you just created
+  </Step>
+  
+  <Step title="Click 'Convert to Video'">
+    This opens Video Studio with your avatar pre-loaded
+  </Step>
+  
+  <Step title="Set Duration">
+    - Start with 3-5 seconds (free with base cost)
+    - Choose motion style: "Moderate" for natural movement
+    - Select format: MP4 (best compatibility)
+  </Step>
+  
+  <Step title="Generate Video">
+    Click "Generate Video"
+    
+    Processing takes 30-45 seconds. You'll see a progress bar.
+    
+    **Cost:** 30 credits for 5-second video
+  </Step>
+  
+  <Step title="Preview and Download">
+    Once complete, preview your video and download it!
+  </Step>
+</Steps>
+
+## Step 5: Add Voice (Optional)
+
+<Steps>
+  <Step title="Clone a Voice">
+    - Record 15-30 seconds of clear speech
+    - Or use a preset voice
+    - Upload to Voice Studio
+    - Wait 30 seconds for cloning (5 credits)
+  </Step>
+  
+  <Step title="Generate Speech">
+    - Write your text (e.g., "Welcome to my channel!")
+    - Select your cloned voice
+    - Generate audio (5 credits + 1 per second)
+  </Step>
+  
+  <Step title="Sync with Video">
+    - In Video Studio, add your audio track
+    - Enable "Auto Lip-Sync"
+    - Re-render video with audio
+  </Step>
+</Steps>
+
+## Understanding Credits
+
+Credits are Percify's currency for AI operations:
+
+<CardGroup cols={3}>
+  <Card title="Avatar (Flux)" icon="coins">
+    **2 credits** per generation
+    Fast, good quality
+  </Card>
+  <Card title="Avatar (Premium)" icon="gem">
+    **5 credits** per generation
+    Highest quality
+  </Card>
+  <Card title="Video (5s)" icon="film">
+    **30 credits** base cost
+    +6 credits per extra second
+  </Card>
+  <Card title="Voice Clone" icon="microphone">
+    **5 credits** one-time
+    Reuse unlimited times
+  </Card>
+  <Card title="Audio (10s)" icon="volume">
+    **15 credits** total
+    5 base + 1 per second
+  </Card>
+  <Card title="Premium Features" icon="star">
+    **10-30 credits**
+    Percify Yourself, Avatar Cast
+  </Card>
+</CardGroup>
+
+### Purchase More Credits
+
+When you run low:
+
+1. Go to Settings → Credits
+2. Choose a pack:
+   - 100 credits - $9.99
+   - 500 credits - $49.99 (+50 bonus)
+   - 1000 credits - $89.99 (+150 bonus)
+3. Pay via Stripe or Razorpay
+4. Credits appear instantly
+
+### Pro Tip: Subscription Plans
+
+Monthly plans include credits + perks:
+
+| Plan | Price | Credits/mo | Perks |
+|------|-------|-----------|-------|
+| **Free** | $0 | 0 | Basic features |
+| **Pro** | $29/mo | 500 | Priority processing, advanced models |
+| **Enterprise** | Custom | Custom | Dedicated support, custom limits |
+
+## Next Steps
+
+### Explore More Features
+
+<CardGroup cols={2}>
+  <Card title="Avatar Studio Deep Dive" icon="palette" href="/percify/avatar-studio">
+    Master prompt engineering and advanced generation
+  </Card>
+  <Card title="Video Creation Guide" icon="video" href="/percify/image-to-video">
+    Learn motion styles, camera effects, and optimization
+  </Card>
+  <Card title="Voice Cloning Tutorial" icon="microphone" href="/percify/voice-cloning">
+    Create perfect voice clones and natural speech
+  </Card>
+  <Card title="API Integration" icon="code" href="/api-reference/introduction">
+    Build apps with Percify's powerful API
+  </Card>
+</CardGroup>
+
+### Join the Community
+
+<CardGroup cols={3}>
+  <Card title="Discord" icon="discord" href="https://discord.gg/percify">
+    Chat with creators and get help
+  </Card>
+  <Card title="Gallery" icon="images" href="https://percify.io/gallery">
+    Get inspired by community creations
+  </Card>
+  <Card title="Blog" icon="newspaper" href="https://percify.io/blog">
+    Tutorials, tips, and updates
+  </Card>
+</CardGroup>
+
+## Common Questions
+
+<AccordionGroup>
+  <Accordion icon="question" title="How do I get more free credits?">
+    - Verify your email (+10 credits)
+    - Complete profile (+5 credits)
+    - Share your first creation (+10 credits)
+    - Refer friends (50 credits per signup)
+  </Accordion>
+  
+  <Accordion icon="clock" title="How long does generation take?">
+    - Avatars: 3-10 seconds
+    - Videos: 30 seconds to 5 minutes (depends on length)
+    - Voice cloning: 30-60 seconds
+    - Audio generation: 2-5 seconds
+  </Accordion>
+  
+  <Accordion icon="shield" title="Can I use generated content commercially?">
+    Yes! All content you create is yours to use commercially. See our [Terms of Service](https://percify.io/terms) for details.
+  </Accordion>
+  
+  <Accordion icon="images" title="What if I don't like the result?">
+    - Adjust your prompt and regenerate
+    - Try different models
+    - Use negative prompts to exclude unwanted elements
+    - Check out the [Prompt Engineering Guide](/guides/prompt-engineering)
+  </Accordion>
+  
+  <Accordion icon="key" title="Is my API key secure?">
+    - Keys are encrypted at rest
+    - Use HTTPS only
+    - Rotate keys regularly
+    - Never share or commit to version control
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Generation stuck | Wait 30s, refresh page. Contact support if >2 minutes |
+| Insufficient credits | Purchase credits or wait for monthly renewal |
+| Poor quality results | Use more descriptive prompts, try premium models |
+| API errors | Check API key, ensure valid JSON, review error message |
+| Payment failed | Verify payment method, check for sufficient funds |
+
+## Need Help?
+
+<CardGroup cols={3}>
+  <Card title="Documentation" icon="book" href="/percify/faq">
+    Comprehensive FAQ and guides
+  </Card>
+  <Card title="Support" icon="life-ring" href="mailto:support@percify.io">
+    Email our support team
+  </Card>
+  <Card title="Discord Community" icon="discord" href="https://discord.gg/percify">
+    Get help from the community
+  </Card>
+</CardGroup>
+
+---
+
+**Ready to create?** Head to the [Dashboard](https://percify.io/dashboard) and start generating amazing AI content!

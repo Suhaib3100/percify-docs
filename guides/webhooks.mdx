@@ -1,0 +1,671 @@
+---
+title: "Webhooks"
+description: "Receive real-time notifications for Percify events"
+---
+
+## Overview
+
+Webhooks allow you to receive real-time HTTP notifications when events occur in your Percify account. Instead of polling the API for status updates, webhooks push updates to your server automatically.
+
+## Benefits
+
+<CardGroup cols={3}>
+  <Card title="Real-Time Updates" icon="bolt">
+    Get notified instantly when events occur
+  </Card>
+  <Card title="Reduced API Calls" icon="gauge">
+    No need to poll for status updates
+  </Card>
+  <Card title="Efficient" icon="check">
+    Save credits and reduce latency
+  </Card>
+</CardGroup>
+
+## Setting Up Webhooks
+
+### 1. Create an Endpoint
+
+Create an HTTPS endpoint on your server to receive webhook events:
+
+<CodeGroup>
+
+```javascript Node.js/Express
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+app.post('/webhooks/percify', async (req, res) => {
+  const event = req.body;
+  
+  console.log('Received event:', event.type);
+  
+  // Process event
+  switch (event.type) {
+    case 'avatar.completed':
+      await handleAvatarCompleted(event.data);
+      break;
+    case 'video.completed':
+      await handleVideoCompleted(event.data);
+      break;
+    // Handle other events...
+  }
+  
+  // Acknowledge receipt
+  res.sendStatus(200);
+});
+
+app.listen(3000);
+```
+
+```python Python/Flask
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/webhooks/percify', methods=['POST'])
+def webhook():
+    event = request.get_json()
+    
+    print(f"Received event: {event['type']}")
+    
+    # Process event
+    if event['type'] == 'avatar.completed':
+        handle_avatar_completed(event['data'])
+    elif event['type'] == 'video.completed':
+        handle_video_completed(event['data'])
+    # Handle other events...
+    
+    # Acknowledge receipt
+    return jsonify({'status': 'received'}), 200
+
+if __name__ == '__main__':
+    app.run(port=3000)
+```
+
+```php PHP
+<?php
+header('Content-Type: application/json');
+
+$payload = file_get_contents('php://input');
+$event = json_decode($payload, true);
+
+error_log("Received event: " . $event['type']);
+
+// Process event
+switch ($event['type']) {
+    case 'avatar.completed':
+        handle_avatar_completed($event['data']);
+        break;
+    case 'video.completed':
+        handle_video_completed($event['data']);
+        break;
+    // Handle other events...
+}
+
+// Acknowledge receipt
+http_response_code(200);
+echo json_encode(['status' => 'received']);
+?>
+```
+
+</CodeGroup>
+
+### 2. Register Webhook URL
+
+Register your endpoint in the Percify dashboard:
+
+<Steps>
+  <Step title="Navigate to Settings">
+    Go to Dashboard → Settings → Webhooks
+  </Step>
+  
+  <Step title="Add Endpoint">
+    Click "Add Endpoint" and enter your webhook URL
+    
+    **Requirements:**
+    - Must be HTTPS (required for production)
+    - Must respond within 10 seconds
+    - Should return 2xx status code
+  </Step>
+  
+  <Step title="Select Events">
+    Choose which events to receive:
+    - All events (recommended for development)
+    - Specific event types only
+  </Step>
+  
+  <Step title="Save and Test">
+    Save your webhook and click "Send Test Event" to verify
+  </Step>
+</Steps>
+
+### 3. Verify Webhook Signatures
+
+Always verify webhook signatures to ensure requests are from Percify:
+
+<CodeGroup>
+
+```javascript Node.js
+const crypto = require('crypto');
+
+function verifyWebhook(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+    
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignature)
+  );
+}
+
+app.post('/webhooks/percify', (req, res) => {
+  const signature = req.headers['x-percify-signature'];
+  const secret = process.env.PERCIFY_WEBHOOK_SECRET;
+  
+  if (!verifyWebhook(JSON.stringify(req.body), signature, secret)) {
+    return res.status(401).send('Invalid signature');
+  }
+  
+  // Process event...
+  res.sendStatus(200);
+});
+```
+
+```python Python
+import hmac
+import hashlib
+
+def verify_webhook(payload: bytes, signature: str, secret: str) -> bool:
+    expected_signature = hmac.new(
+        secret.encode(),
+        payload,
+        hashlib.sha256
+    ).hexdigest()
+    
+    return hmac.compare_digest(signature, expected_signature)
+
+@app.route('/webhooks/percify', methods=['POST'])
+def webhook():
+    signature = request.headers.get('X-Percify-Signature')
+    secret = os.environ['PERCIFY_WEBHOOK_SECRET']
+    
+    if not verify_webhook(request.get_data(), signature, secret):
+        return 'Invalid signature', 401
+    
+    # Process event...
+    return jsonify({'status': 'received'}), 200
+```
+
+</CodeGroup>
+
+## Event Types
+
+### Avatar Events
+
+#### `avatar.completed`
+Fired when avatar generation completes successfully.
+
+```json
+{
+  "type": "avatar.completed",
+  "id": "evt_abc123",
+  "created": "2025-11-25T06:40:00Z",
+  "data": {
+    "avatarId": "avatar_xyz789",
+    "userId": "user_abc123",
+    "status": "completed",
+    "imageUrl": "https://cdn.percify.io/avatars/avatar_xyz789.png",
+    "thumbnailUrl": "https://cdn.percify.io/avatars/avatar_xyz789_thumb.png",
+    "creditCost": 5,
+    "model": "imagen3",
+    "prompt": "mystical forest guardian"
+  }
+}
+```
+
+#### `avatar.failed`
+Fired when avatar generation fails.
+
+```json
+{
+  "type": "avatar.failed",
+  "id": "evt_def456",
+  "created": "2025-11-25T06:41:00Z",
+  "data": {
+    "avatarId": "avatar_xyz789",
+    "userId": "user_abc123",
+    "status": "failed",
+    "error": {
+      "code": "content_policy_violation",
+      "message": "Prompt violates content policy"
+    }
+  }
+}
+```
+
+#### `avatar.published`
+Fired when an avatar is published to the community feed.
+
+```json
+{
+  "type": "avatar.published",
+  "id": "evt_ghi789",
+  "created": "2025-11-25T06:42:00Z",
+  "data": {
+    "avatarId": "avatar_xyz789",
+    "userId": "user_abc123",
+    "visibility": "public",
+    "publishedAt": "2025-11-25T06:42:00Z"
+  }
+}
+```
+
+### Video Events
+
+#### `video.completed`
+Fired when video generation completes.
+
+```json
+{
+  "type": "video.completed",
+  "id": "evt_jkl012",
+  "created": "2025-11-25T06:45:00Z",
+  "data": {
+    "videoId": "video_abc123",
+    "userId": "user_xyz789",
+    "avatarId": "avatar_def456",
+    "status": "completed",
+    "videoUrl": "https://cdn.percify.io/videos/video_abc123.mp4",
+    "thumbnailUrl": "https://cdn.percify.io/videos/video_abc123_thumb.jpg",
+    "durationSeconds": 8,
+    "creditCost": 48,
+    "resolution": "720p"
+  }
+}
+```
+
+#### `video.failed`
+Fired when video generation fails.
+
+```json
+{
+  "type": "video.failed",
+  "id": "evt_mno345",
+  "created": "2025-11-25T06:46:00Z",
+  "data": {
+    "videoId": "video_abc123",
+    "userId": "user_xyz789",
+    "status": "failed",
+    "error": {
+      "code": "processing_error",
+      "message": "Video generation failed due to server error"
+    }
+  }
+}
+```
+
+### Audio Events
+
+#### `audio.completed`
+Fired when audio generation completes.
+
+```json
+{
+  "type": "audio.completed",
+  "id": "evt_pqr678",
+  "created": "2025-11-25T06:50:00Z",
+  "data": {
+    "audioId": "audio_xyz123",
+    "userId": "user_abc456",
+    "voiceId": "voice_def789",
+    "status": "completed",
+    "audioUrl": "https://cdn.percify.io/audio/audio_xyz123.mp3",
+    "durationSeconds": 5.2,
+    "creditCost": 10
+  }
+}
+```
+
+#### `voice.cloned`
+Fired when voice cloning completes.
+
+```json
+{
+  "type": "voice.cloned",
+  "id": "evt_stu901",
+  "created": "2025-11-25T06:52:00Z",
+  "data": {
+    "voiceId": "voice_abc123",
+    "userId": "user_xyz789",
+    "name": "My Custom Voice",
+    "language": "en-US",
+    "status": "completed",
+    "creditCost": 5
+  }
+}
+```
+
+### Credit Events
+
+#### `credits.low_balance`
+Fired when credit balance drops below threshold.
+
+```json
+{
+  "type": "credits.low_balance",
+  "id": "evt_vwx234",
+  "created": "2025-11-25T06:55:00Z",
+  "data": {
+    "userId": "user_abc123",
+    "balance": 25,
+    "threshold": 50,
+    "recommendation": "purchase_pack_500"
+  }
+}
+```
+
+#### `credits.purchased`
+Fired when credits are purchased.
+
+```json
+{
+  "type": "credits.purchased",
+  "id": "evt_yz567",
+  "created": "2025-11-25T06:58:00Z",
+  "data": {
+    "userId": "user_abc123",
+    "purchaseId": "purchase_xyz789",
+    "amount": 500,
+    "bonusAmount": 50,
+    "newBalance": 575,
+    "price": 49.99,
+    "currency": "USD"
+  }
+}
+```
+
+### User Events
+
+#### `tier.upgraded`
+Fired when user upgrades subscription tier.
+
+```json
+{
+  "type": "tier.upgraded",
+  "id": "evt_abc890",
+  "created": "2025-11-25T07:00:00Z",
+  "data": {
+    "userId": "user_abc123",
+    "previousTier": "free",
+    "newTier": "pro",
+    "effectiveDate": "2025-11-25T07:00:00Z"
+  }
+}
+```
+
+## Implementing Event Handlers
+
+### Complete Example
+
+```javascript
+const express = require('express');
+const { verifyWebhook } = require('./utils/webhook');
+const { processAvatar, processVideo, notifyUser } = require('./handlers');
+
+const app = express();
+app.use(express.json());
+
+const eventHandlers = {
+  'avatar.completed': async (data) => {
+    console.log(`Avatar ${data.avatarId} completed`);
+    
+    // Save to database
+    await db.avatars.update(data.avatarId, {
+      status: 'completed',
+      imageUrl: data.imageUrl
+    });
+    
+    // Notify user
+    await notifyUser(data.userId, {
+      type: 'avatar_ready',
+      avatarId: data.avatarId
+    });
+    
+    // Start video generation if configured
+    if (shouldGenerateVideo(data.userId)) {
+      await startVideoGeneration(data.avatarId);
+    }
+  },
+  
+  'video.completed': async (data) => {
+    console.log(`Video ${data.videoId} completed`);
+    
+    // Update database
+    await db.videos.update(data.videoId, {
+      status: 'completed',
+      videoUrl: data.videoUrl
+    });
+    
+    // Send email notification
+    await sendEmail(data.userId, {
+      subject: 'Your video is ready!',
+      videoUrl: data.videoUrl
+    });
+  },
+  
+  'credits.low_balance': async (data) => {
+    console.log(`User ${data.userId} has low credits: ${data.balance}`);
+    
+    // Send push notification
+    await sendPushNotification(data.userId, {
+      title: 'Running low on credits',
+      body: `You have ${data.balance} credits remaining.`,
+      action: 'purchase_credits'
+    });
+  },
+  
+  'avatar.failed': async (data) => {
+    console.error(`Avatar ${data.avatarId} failed:`, data.error);
+    
+    // Log error
+    await logError(data.avatarId, data.error);
+    
+    // Refund credits if appropriate
+    if (shouldRefund(data.error.code)) {
+      await refundCredits(data.userId, data.creditCost);
+    }
+    
+    // Notify user
+    await notifyUser(data.userId, {
+      type: 'avatar_failed',
+      avatarId: data.avatarId,
+      error: data.error.message
+    });
+  }
+};
+
+app.post('/webhooks/percify', async (req, res) => {
+  const signature = req.headers['x-percify-signature'];
+  const secret = process.env.PERCIFY_WEBHOOK_SECRET;
+  
+  // Verify signature
+  if (!verifyWebhook(JSON.stringify(req.body), signature, secret)) {
+    return res.status(401).send('Invalid signature');
+  }
+  
+  const event = req.body;
+  
+  // Handle event
+  const handler = eventHandlers[event.type];
+  if (handler) {
+    try {
+      await handler(event.data);
+    } catch (error) {
+      console.error(`Error handling ${event.type}:`, error);
+      // Still return 200 to avoid retries for application errors
+    }
+  } else {
+    console.log(`Unhandled event type: ${event.type}`);
+  }
+  
+  res.sendStatus(200);
+});
+
+app.listen(3000);
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion icon="shield" title="Always Verify Signatures">
+    Never process webhooks without signature verification. This prevents replay attacks and ensures authenticity.
+    
+    ```javascript
+    if (!verifySignature(payload, signature, secret)) {
+      return res.status(401).send('Invalid signature');
+    }
+    ```
+  </Accordion>
+  
+  <Accordion icon="check" title="Respond Quickly">
+    Acknowledge receipt within 10 seconds. Process heavy tasks asynchronously.
+    
+    ```javascript
+    app.post('/webhooks/percify', async (req, res) => {
+      // Acknowledge immediately
+      res.sendStatus(200);
+      
+      // Process asynchronously
+      processWebhookAsync(req.body).catch(console.error);
+    });
+    ```
+  </Accordion>
+  
+  <Accordion icon="rotate" title="Handle Retries">
+    Percify retries failed webhooks with exponential backoff. Make your handlers idempotent.
+    
+    ```javascript
+    async function handleAvatarCompleted(data) {
+      // Check if already processed
+      const existing = await db.find(data.avatarId);
+      if (existing?.processed) {
+        return; // Skip duplicate
+      }
+      
+      // Process and mark as complete
+      await processAvatar(data);
+      await db.markProcessed(data.avatarId);
+    }
+    ```
+  </Accordion>
+  
+  <Accordion icon="clock" title="Use Queue for Heavy Processing">
+    ```javascript
+    const queue = new Queue('webhooks');
+    
+    app.post('/webhooks/percify', async (req, res) => {
+      // Add to queue
+      await queue.add(req.body);
+      
+      // Respond immediately
+      res.sendStatus(200);
+    });
+    
+    // Process queue asynchronously
+    queue.process(async (job) => {
+      await processEvent(job.data);
+    });
+    ```
+  </Accordion>
+  
+  <Accordion icon="bug" title="Log All Events">
+    Keep detailed logs for debugging:
+    
+    ```javascript
+    await logWebhook({
+      eventId: event.id,
+      eventType: event.type,
+      receivedAt: new Date(),
+      payload: event.data,
+      processed: true
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Testing Webhooks
+
+### Local Development with ngrok
+
+```bash
+# Install ngrok
+npm install -g ngrok
+
+# Start your server
+node server.js
+
+# Create tunnel in another terminal
+ngrok http 3000
+
+# Use the HTTPS URL in Percify dashboard
+# https://abc123.ngrok.io/webhooks/percify
+```
+
+### Test Events
+
+Send test events from the dashboard or via CLI:
+
+```bash
+curl -X POST https://your-domain.com/webhooks/percify \
+  -H "Content-Type: application/json" \
+  -H "X-Percify-Signature: test_signature" \
+  -d '{
+    "type": "avatar.completed",
+    "id": "evt_test123",
+    "created": "2025-11-25T07:00:00Z",
+    "data": {
+      "avatarId": "avatar_test",
+      "status": "completed"
+    }
+  }'
+```
+
+## Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Webhooks not received | URL not HTTPS | Use HTTPS for production |
+| 401 Invalid signature | Wrong secret or verification logic | Check webhook secret in dashboard |
+| Timeout errors | Handler takes too long | Respond within 10s, process async |
+| Duplicate events | Retry logic | Implement idempotent handlers |
+| Events out of order | Network delays | Don't rely on event order |
+
+## Security Checklist
+
+- [ ] Always verify webhook signatures
+- [ ] Use HTTPS endpoints only
+- [ ] Respond within 10 seconds
+- [ ] Store webhook secrets securely
+- [ ] Implement idempotent handlers
+- [ ] Log all webhook events
+- [ ] Monitor for suspicious activity
+- [ ] Rate limit webhook endpoint
+- [ ] Validate event data structure
+- [ ] Handle errors gracefully
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Explore all API endpoints
+  </Card>
+  <Card title="SDK Integration" icon="puzzle-piece" href="/guides/sdk-integration">
+    Use official SDKs
+  </Card>
+  <Card title="Support" icon="life-ring" href="mailto:support@percify.io">
+    Get webhook setup help
+  </Card>
+</CardGroup>

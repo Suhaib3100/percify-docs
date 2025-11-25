@@ -1,0 +1,457 @@
+---
+title: "Image to Video"
+description: "Transform static avatar images into dynamic animated video clips"
+---
+
+## Overview
+
+Percify's Image-to-Video feature brings your static avatars to life with AI-powered animation. Convert any avatar image into a short video clip with natural motion, lip-sync capabilities, and customizable duration.
+
+<CardGroup cols={2}>
+  <Card title="Instant Animation" icon="wand-magic-sparkles">
+    Add motion to static images in seconds
+  </Card>
+  <Card title="Flexible Duration" icon="clock">
+    Generate clips from 1 to 30 seconds
+  </Card>
+  <Card title="Smart Motion" icon="video">
+    AI-powered natural movement and expressions
+  </Card>
+  <Card title="Lip Sync Ready" icon="lips">
+    Perfect for adding voice tracks
+  </Card>
+</CardGroup>
+
+## How It Works
+
+The Image-to-Video pipeline uses advanced AI models to:
+1. Analyze the input image structure and features
+2. Generate intermediate frames with natural motion
+3. Apply facial animations and subtle movements
+4. Render smooth transitions at 30fps
+5. Optimize for web delivery and streaming
+
+## Video Studio Tiers
+
+### Basic Video Studio
+- **Base Cost:** 30 credits (includes first 5 seconds)
+- **Additional:** +6 credits per second after 5s
+- **Max Duration:** 10 seconds
+- **Quality:** 720p, 30fps
+- **Motion:** Standard animation
+- **Best for:** Social media, quick clips
+
+### Reality Lab (Premium)
+- **Base Cost:** 20 credits (includes first 5 seconds)
+- **Additional:** +4 credits per second after 5s
+- **Max Duration:** 30 seconds
+- **Quality:** 1080p, 60fps option
+- **Motion:** Cinematic, advanced expressions
+- **Best for:** Professional content, presentations
+
+## Credit Cost Formula
+
+```
+Total Cost = Base Cost + (Additional Seconds × Per-Second Rate)
+```
+
+### Examples
+| Duration | Studio Type | Calculation | Total Credits |
+|----------|-------------|-------------|---------------|
+| 3 seconds | Basic | 30 + (0 × 6) | 30 |
+| 5 seconds | Basic | 30 + (0 × 6) | 30 |
+| 8 seconds | Basic | 30 + (3 × 6) | 48 |
+| 10 seconds | Basic | 30 + (5 × 6) | 60 |
+| 3 seconds | Reality Lab | 20 + (0 × 4) | 20 |
+| 10 seconds | Reality Lab | 20 + (5 × 4) | 40 |
+| 15 seconds | Reality Lab | 20 + (10 × 4) | 60 |
+
+<Tip>
+**Cost Optimization:** Keep videos under 5 seconds to avoid per-second charges. Perfect for loops and social media clips!
+</Tip>
+
+## Creating a Video
+
+<Steps>
+  <Step title="Select Your Avatar">
+    Choose an avatar from your gallery or generate a new one in Avatar Studio
+  </Step>
+  <Step title="Open Video Studio">
+    Click "Convert to Video" or navigate to Video Studio from the dashboard
+  </Step>
+  <Step title="Configure Settings">
+    - Set video duration (1-30 seconds)
+    - Choose studio tier (Basic or Reality Lab)
+    - Select motion style (subtle, moderate, dynamic)
+    - Add audio track (optional)
+  </Step>
+  <Step title="Generate Video">
+    Click "Generate" and wait for processing (typically 30-60 seconds per 10s of video)
+  </Step>
+  <Step title="Preview & Download">
+    Review the generated video, make adjustments if needed, then download or publish
+  </Step>
+</Steps>
+
+## Motion Styles
+
+### Subtle Motion
+- Gentle breathing animations
+- Slight head movements
+- Soft eye blinks
+- **Best for:** Professional portraits, peaceful scenes
+- **Processing:** Fastest generation
+
+### Moderate Motion
+- Natural head turns (±15°)
+- Expression changes
+- Hair and clothing physics
+- **Best for:** Conversational clips, character introductions
+- **Processing:** Standard speed
+
+### Dynamic Motion
+- Full range of motion
+- Dramatic expressions
+- Background parallax effects
+- **Best for:** Action scenes, music videos, creative content
+- **Processing:** Requires Reality Lab
+
+## API Integration
+
+### Generate Video from Avatar
+
+<CodeGroup>
+
+```javascript Node.js
+const response = await fetch('https://api.percify.io/v1/videos/from-image', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${process.env.PERCIFY_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    imageId: 'avatar_123',
+    durationSeconds: 5,
+    studioTier: 'basic',
+    motionStyle: 'moderate',
+    outputFormat: 'mp4'
+  })
+});
+
+const video = await response.json();
+console.log(`Video ID: ${video.id}, Status: ${video.status}`);
+```
+
+```python Python
+import os
+from percify import Percify
+
+client = Percify(api_key=os.environ['PERCIFY_API_KEY'])
+
+video = client.videos.from_image(
+    image_id='avatar_123',
+    duration_seconds=5,
+    studio_tier='basic',
+    motion_style='moderate',
+    output_format='mp4'
+)
+
+print(f"Video ID: {video.id}, Status: {video.status}")
+```
+
+```bash cURL
+curl -X POST https://api.percify.io/v1/videos/from-image \
+  -H "Authorization: Bearer $PERCIFY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "imageId": "avatar_123",
+    "durationSeconds": 5,
+    "studioTier": "basic",
+    "motionStyle": "moderate",
+    "outputFormat": "mp4"
+  }'
+```
+
+</CodeGroup>
+
+### Check Video Status
+
+```bash
+curl -X GET https://api.percify.io/v1/videos/video_456 \
+  -H "Authorization: Bearer $PERCIFY_API_KEY"
+```
+
+Response:
+```json
+{
+  "id": "video_456",
+  "status": "completed",
+  "videoUrl": "https://cdn.percify.io/videos/video_456.mp4",
+  "thumbnailUrl": "https://cdn.percify.io/videos/video_456_thumb.jpg",
+  "durationSeconds": 5,
+  "resolution": "720p",
+  "fps": 30,
+  "fileSize": 2456789,
+  "creditCost": 30,
+  "createdAt": "2025-11-25T05:40:00Z",
+  "completedAt": "2025-11-25T05:40:45Z"
+}
+```
+
+### Poll for Completion
+
+```javascript
+async function waitForVideo(videoId) {
+  const maxAttempts = 60; // 5 minutes max
+  const pollInterval = 5000; // 5 seconds
+  
+  for (let i = 0; i < maxAttempts; i++) {
+    const response = await fetch(
+      `https://api.percify.io/v1/videos/${videoId}`,
+      {
+        headers: { 'Authorization': `Bearer ${process.env.PERCIFY_API_KEY}` }
+      }
+    );
+    
+    const video = await response.json();
+    
+    if (video.status === 'completed') {
+      return video;
+    } else if (video.status === 'failed') {
+      throw new Error(`Video generation failed: ${video.error}`);
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, pollInterval));
+  }
+  
+  throw new Error('Video generation timed out');
+}
+```
+
+## Adding Audio Tracks
+
+Combine your animated video with voice cloning for fully realized characters:
+
+<Steps>
+  <Step title="Generate Video">
+    Create your base video animation
+  </Step>
+  <Step title="Generate or Upload Audio">
+    Use voice cloning or upload pre-recorded audio
+  </Step>
+  <Step title="Sync Audio to Video">
+    Automatically align lip movements with speech
+  </Step>
+  <Step title="Render Final Composite">
+    Export combined video with synchronized audio
+  </Step>
+</Steps>
+
+### API Example with Audio
+
+```javascript
+// 1. Generate video
+const video = await client.videos.fromImage({
+  imageId: 'avatar_123',
+  durationSeconds: 8
+});
+
+// 2. Generate voice audio
+const audio = await client.audio.generate({
+  text: 'Welcome to Percify! Create amazing AI avatars in seconds.',
+  voiceId: 'voice_default',
+  speed: 1.0
+});
+
+// 3. Sync audio with video (automatic lip-sync)
+const syncedVideo = await client.videos.addAudio({
+  videoId: video.id,
+  audioId: audio.id,
+  enableLipSync: true
+});
+
+console.log(`Final video URL: ${syncedVideo.videoUrl}`);
+```
+
+## Advanced Features
+
+### Background Replacement
+Replace or remove backgrounds during video generation:
+
+```javascript
+await client.videos.fromImage({
+  imageId: 'avatar_123',
+  durationSeconds: 5,
+  background: {
+    type: 'replacement',
+    imageUrl: 'https://example.com/custom-bg.jpg'
+  }
+});
+```
+
+### Camera Motion
+Add camera movements for cinematic effects:
+
+```javascript
+await client.videos.fromImage({
+  imageId: 'avatar_123',
+  durationSeconds: 10,
+  cameraMotion: {
+    type: 'zoom-in',
+    intensity: 'subtle'
+  }
+});
+```
+
+Available camera motions:
+- `static` - No camera movement
+- `zoom-in` - Gradual zoom toward subject
+- `zoom-out` - Pull back reveal
+- `pan-left` / `pan-right` - Horizontal camera movement
+- `orbit` - 360° rotation around subject (Reality Lab only)
+
+### Custom Frame Rate
+Control video smoothness:
+
+```javascript
+await client.videos.fromImage({
+  imageId: 'avatar_123',
+  durationSeconds: 5,
+  fps: 60, // 24, 30, or 60
+  studioTier: 'reality-lab' // 60fps requires Reality Lab
+});
+```
+
+## Performance & Processing Times
+
+| Duration | Studio Type | Typical Processing Time |
+|----------|-------------|------------------------|
+| 3-5s | Basic | 20-35 seconds |
+| 6-10s | Basic | 40-75 seconds |
+| 3-5s | Reality Lab | 35-60 seconds |
+| 10-15s | Reality Lab | 90-150 seconds |
+| 15-30s | Reality Lab | 3-5 minutes |
+
+<Info>
+**Processing Priority:** Enterprise tier users receive priority processing with 2x faster generation times.
+</Info>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion icon="image" title="Optimize Input Images">
+    - Use high-resolution avatars (1024x1024 or higher)
+    - Ensure clean, well-lit images
+    - Center the subject in frame
+    - Avoid cropped faces for best results
+  </Accordion>
+  
+  <Accordion icon="clock" title="Choose Appropriate Duration">
+    - 3-5s: Social media clips, loops
+    - 5-10s: Introductions, greetings
+    - 10-15s: Short messages, explanations
+    - 15-30s: Detailed presentations (Reality Lab only)
+  </Accordion>
+  
+  <Accordion icon="gauge" title="Balance Quality vs. Cost">
+    - Start with Basic Studio for testing
+    - Use Reality Lab for final productions
+    - Keep under 5s to minimize per-second charges
+    - Batch similar videos for workflow efficiency
+  </Accordion>
+  
+  <Accordion icon="video" title="Post-Processing Tips">
+    - Download in highest quality available
+    - Apply color grading externally if needed
+    - Compress for web delivery (Percify provides optimized versions)
+    - Add captions for accessibility
+  </Accordion>
+</AccordionGroup>
+
+## Output Formats & Specs
+
+### Video Formats
+- **MP4 (H.264):** Best compatibility, recommended for most uses
+- **WebM (VP9):** Smaller file size, good for web embedding
+- **MOV (ProRes):** High quality, for professional editing workflows (Reality Lab only)
+
+### Technical Specifications
+
+| Tier | Resolution | FPS | Bitrate | Codec |
+|------|-----------|-----|---------|-------|
+| Basic | 720p (1280×720) | 30 | 2-4 Mbps | H.264 |
+| Reality Lab | 1080p (1920×1080) | 30/60 | 5-8 Mbps | H.264/H.265 |
+
+## Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Video stuck "processing" | Queue overload or long duration | Wait up to processing time estimate, contact support after 10 min |
+| Artifacts or glitches | Low quality input image | Use higher resolution avatar, avoid heavily compressed images |
+| Unnatural motion | Misaligned features | Regenerate avatar with clearer facial features |
+| Audio out of sync | Timing mismatch | Re-run lip-sync with `enableLipSync: true` |
+| Insufficient credits | Cost exceeds balance | Reduce duration or purchase more credits |
+
+## Webhooks for Video Completion
+
+Subscribe to webhooks to get notified when videos complete:
+
+```javascript
+// Setup webhook endpoint
+app.post('/webhooks/percify', (req, res) => {
+  const event = req.body;
+  
+  if (event.type === 'video.completed') {
+    const video = event.data;
+    console.log(`Video ${video.id} completed: ${video.videoUrl}`);
+    
+    // Process completed video
+    processVideo(video);
+  }
+  
+  res.sendStatus(200);
+});
+```
+
+Configure webhook URL in dashboard: Settings → Webhooks → Add Endpoint
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Social Media Content" icon="hashtag">
+    Create engaging profile videos and story content
+  </Card>
+  <Card title="Educational Videos" icon="graduation-cap">
+    Animated instructors and presenters
+  </Card>
+  <Card title="Marketing Campaigns" icon="bullhorn">
+    Dynamic ad creative and product demos
+  </Card>
+  <Card title="Game Development" icon="gamepad">
+    Character cutscenes and dialogue
+  </Card>
+  <Card title="Virtual Assistants" icon="robot">
+    Animated chatbot avatars
+  </Card>
+  <Card title="Music Videos" icon="music">
+    AI-generated performers and visuals
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={3}>
+  <Card title="Voice Cloning" icon="microphone" href="/percify/voice-cloning">
+    Add voice to your videos
+  </Card>
+  <Card title="Video API Reference" icon="code" href="/api-reference/video-studio/overview">
+    Complete API documentation
+  </Card>
+  <Card title="Credits System" icon="coins" href="/percify/credits">
+    Understand video pricing
+  </Card>
+</CardGroup>
+
+## Support
+
+Questions about Image-to-Video? Check the [FAQ](/percify/faq) or contact support@percify.io.
