@@ -1,16 +1,19 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "Percify API",
+    "description": "Percify AI Avatar & Video Generation API - Create stunning AI-generated avatars, videos, and voice content",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Percify Support",
+      "email": "support@percify.io",
+      "url": "https://percify.io"
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://percify.io/api",
+      "description": "Production API"
     }
   ],
   "security": [
@@ -19,36 +22,35 @@
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+    "/avatars/generate": {
+      "post": {
+        "summary": "Generate Avatar",
+        "description": "Generate a new AI avatar using the specified model and prompt",
+        "operationId": "generateAvatar",
+        "tags": ["Avatars"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateAvatarRequest"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Avatar generated successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
+                  "$ref": "#/components/schemas/Avatar"
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Invalid request",
             "content": {
               "application/json": {
                 "schema": {
@@ -56,35 +58,19 @@
                 }
               }
             }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
           },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
+          "402": {
+            "description": "Insufficient credits",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
           },
-          "400": {
-            "description": "unexpected error",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,28 +82,45 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/avatars": {
+      "get": {
+        "summary": "List Avatars",
+        "description": "Get a paginated list of user's avatars",
+        "operationId": "listAvatars",
+        "tags": ["Avatars"],
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of avatars to return",
             "schema": {
               "type": "integer",
-              "format": "int64"
+              "default": 20,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Pagination cursor for next page",
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "List of avatars",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvatarList"
+                }
+              }
+            }
           },
-          "400": {
-            "description": "unexpected error",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -128,89 +131,554 @@
           }
         }
       }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    },
+    "/avatars/{id}": {
+      "get": {
+        "summary": "Get Avatar",
+        "description": "Get details of a specific avatar",
+        "operationId": "getAvatar",
+        "tags": ["Avatars"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Avatar ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avatar details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Avatar"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Avatar not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Avatar",
+        "description": "Delete an avatar",
+        "operationId": "deleteAvatar",
+        "tags": ["Avatars"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Avatar ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avatar deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Avatar not found"
+          }
+        }
+      }
+    },
+    "/videos/create": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "summary": "Create Video",
+        "description": "Create a video from an avatar image using image-to-video AI",
+        "operationId": "createVideo",
+        "tags": ["Videos"],
         "requestBody": {
-          "description": "Plant added to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/CreateVideoRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "Video creation started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Video"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient credits"
+          }
+        }
+      }
+    },
+    "/videos/{id}": {
+      "get": {
+        "summary": "Get Video",
+        "description": "Get video details and status",
+        "operationId": "getVideo",
+        "tags": ["Videos"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Video ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Video details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Video"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Video not found"
+          }
+        }
+      }
+    },
+    "/voices/clone": {
+      "post": {
+        "summary": "Clone Voice",
+        "description": "Create a voice clone from an audio sample",
+        "operationId": "cloneVoice",
+        "tags": ["Voices"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CloneVoiceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Voice cloned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Voice"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voices/generate": {
+      "post": {
+        "summary": "Generate Audio",
+        "description": "Generate speech audio using a voice",
+        "operationId": "generateAudio",
+        "tags": ["Voices"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateAudioRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Audio generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Audio"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credits/balance": {
+      "get": {
+        "summary": "Get Credit Balance",
+        "description": "Get current credit balance for the authenticated user",
+        "operationId": "getCreditBalance",
+        "tags": ["Credits"],
+        "responses": {
+          "200": {
+            "description": "Credit balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditBalance"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credits/history": {
+      "get": {
+        "summary": "Get Credit History",
+        "description": "Get credit transaction history",
+        "operationId": "getCreditHistory",
+        "tags": ["Credits"],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Credit history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditHistory"
+                }
+              }
+            }
           }
         }
       }
     }
   },
   "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Your Percify API token"
+      }
+    },
+    "schemas": {
+      "GenerateAvatarRequest": {
+        "type": "object",
+        "required": ["prompt"],
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "Text description of the avatar to generate",
+            "example": "Professional headshot of a young entrepreneur, confident smile, modern office background, warm lighting"
+          },
+          "model": {
+            "type": "string",
+            "enum": ["flux", "imagen3", "reality4"],
+            "default": "flux",
+            "description": "AI model to use for generation"
+          },
+          "aspectRatio": {
+            "type": "string",
+            "enum": ["1:1", "16:9", "9:16", "4:3", "3:4"],
+            "default": "1:1",
+            "description": "Output image aspect ratio"
+          },
+          "negativePrompt": {
+            "type": "string",
+            "description": "Elements to avoid in the generation"
+          },
+          "seed": {
+            "type": "integer",
+            "description": "Seed for reproducible results"
+          }
+        }
+      },
+      "Avatar": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique avatar identifier"
+          },
+          "imageUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the generated avatar image"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Prompt used for generation"
+          },
+          "model": {
+            "type": "string",
+            "description": "AI model used"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["processing", "completed", "failed"],
+            "description": "Generation status"
+          },
+          "creditsUsed": {
+            "type": "integer",
+            "description": "Credits consumed for this generation"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AvatarList": {
+        "type": "object",
+        "properties": {
+          "avatars": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Avatar"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateVideoRequest": {
+        "type": "object",
+        "required": ["avatarId"],
+        "properties": {
+          "avatarId": {
+            "type": "string",
+            "description": "ID of the avatar to animate"
+          },
+          "duration": {
+            "type": "integer",
+            "default": 5,
+            "minimum": 3,
+            "maximum": 10,
+            "description": "Video duration in seconds"
+          },
+          "motionStyle": {
+            "type": "string",
+            "enum": ["subtle", "natural", "expressive"],
+            "default": "natural"
+          },
+          "audioId": {
+            "type": "string",
+            "description": "Optional audio ID for lip-sync"
+          }
+        }
+      },
+      "Video": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "videoUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["queued", "processing", "completed", "failed"]
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "creditsUsed": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CloneVoiceRequest": {
+        "type": "object",
+        "required": ["name", "audioFile"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name for the cloned voice"
+          },
+          "audioFile": {
+            "type": "string",
+            "format": "binary",
+            "description": "Audio sample (MP3, WAV, M4A, max 10MB)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description"
+          }
+        }
+      },
+      "Voice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["cloned", "preset"]
+          },
+          "sampleUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GenerateAudioRequest": {
+        "type": "object",
+        "required": ["text", "voiceId"],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Text to convert to speech",
+            "maxLength": 5000
+          },
+          "voiceId": {
+            "type": "string",
+            "description": "ID of the voice to use"
+          },
+          "language": {
+            "type": "string",
+            "default": "en",
+            "description": "Language code (en, es, fr, de, etc.)"
+          },
+          "speed": {
+            "type": "number",
+            "default": 1.0,
+            "minimum": 0.5,
+            "maximum": 2.0
+          }
+        }
+      },
+      "Audio": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "audioUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Audio duration in seconds"
+          },
+          "creditsUsed": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreditBalance": {
+        "type": "object",
+        "properties": {
+          "balance": {
+            "type": "integer",
+            "description": "Current credit balance"
+          },
+          "totalPurchased": {
+            "type": "integer"
+          },
+          "totalUsed": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreditHistory": {
+        "type": "object",
+        "properties": {
+          "transactions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["purchase", "usage", "refund", "bonus"]
+                },
+                "amount": {
+                  "type": "integer"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
       }
     }
   }

@@ -3,56 +3,70 @@ title: "Percify Overview"
 description: "What Percify is, what you can build, and where to go next"
 ---
 
-import { Callout } from 'nextra/components';
-
 ## What is Percify?
 
-Percify is a creative AI platform for generating and managing personalized avatars, transforming images into short form videos, cloning voices, and publishing safe, performant user‑generated media at scale. You get:
+Percify is a creative AI platform for generating and managing personalized avatars, transforming images into short form videos, cloning voices, and publishing safe, performant user‑generated media at scale.
 
-<Columns cols={3}>
-  <Card title="Avatar Studio" icon="user-astronaut" href="/percify/avatar-studio">Create & evolve AI avatars.</Card>
-  <Card title="Image → Video" icon="film" href="/percify/image-to-video">Turn stills into dynamic clips.</Card>
-  <Card title="Voice Cloning" icon="microphone" href="/percify/voice-cloning">Generate natural speech.</Card>
-  <Card title="Credit System" icon="coins" href="/percify/credits">Predictable usage-based pricing.</Card>
-  <Card title="API & Auth" icon="key" href="/percify/api-auth">Integrate programmatically.</Card>
-  <Card title="Performance" icon="gauge" href="/percify/performance">Optimized & scalable.</Card>
-</Columns>
+<CardGroup cols={3}>
+  <Card title="Avatar Studio" icon="user-astronaut" href="/percify/avatar-studio">Create & evolve AI avatars</Card>
+  <Card title="Image → Video" icon="film" href="/percify/image-to-video">Turn stills into dynamic clips</Card>
+  <Card title="Voice Cloning" icon="microphone" href="/percify/voice-cloning">Generate natural speech</Card>
+  <Card title="Credit System" icon="coins" href="/percify/credits">Predictable usage-based pricing</Card>
+  <Card title="API & Auth" icon="key" href="/percify/api-auth">Integrate programmatically</Card>
+  <Card title="Performance" icon="gauge" href="/percify/performance">Optimized & scalable</Card>
+</CardGroup>
 
-<Callout emoji="🚀">New here? Start with the Quickstart or jump straight to Avatar Studio.</Callout>
+<Tip>New here? Start with the [Quickstart](/quickstart) or jump straight to [Avatar Studio](/percify/avatar-studio).</Tip>
 
 ## Core User Journey
 
-1. Sign up & obtain your API key
-2. Purchase / receive starter credits
-3. Generate first avatar (image) → refine → publish
-4. Convert avatar to a short video clip
-5. Add a cloned voice track (optional)
-6. Share or embed using public endpoints
+<Steps>
+  <Step title="Sign Up & Get API Key">
+    Create your Percify account and obtain your API key from the dashboard
+  </Step>
+  <Step title="Get Credits">
+    Purchase credits or receive starter credits with your plan
+  </Step>
+  <Step title="Generate Your First Avatar">
+    Use Avatar Studio to create stunning AI-generated portraits
+  </Step>
+  <Step title="Animate with Video">
+    Convert your avatar to a dynamic short video clip
+  </Step>
+  <Step title="Add Voice (Optional)">
+    Clone your voice or use AI voices for narration
+  </Step>
+  <Step title="Share & Embed">
+    Publish to the feed or integrate via API
+  </Step>
+</Steps>
 
 ## Why Credits?
 
-Credits provide transparent, tier‑agnostic pricing and enable advanced features like per‑second video scaling, fair voice generation metering, and future tier overrides. See the full breakdown in [/percify/credits].
+Credits provide transparent, tier‑agnostic pricing and enable advanced features like per‑second video scaling, fair voice generation metering, and future tier overrides. 
+
+<Info>See the full breakdown in [Credits & Pricing](/percify/credits).</Info>
 
 ## Reliability & Safety
 
-Percify implements a ban system, content visibility controls, and rate limiting to keep the platform healthy. Learn more in [/percify/security].
+Percify implements a ban system, content visibility controls, and rate limiting to keep the platform healthy. Learn more in [Security & Trust](/percify/security).
 
 ## Architecture at a Glance
 
 <CardGroup cols={2}>
-  <Card title="High-Level Architecture" icon="diagram-project" href="/percify/architecture">Stack, flows, data stores.</Card>
-  <Card title="API Reference" icon="code" href="/api-reference/introduction">Endpoints & schemas.</Card>
+  <Card title="High-Level Architecture" icon="diagram-project" href="/percify/architecture">Stack, flows, data stores</Card>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">Endpoints & schemas</Card>
 </CardGroup>
 
 ## Next Steps
 
 <CardGroup cols={3}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">Local + first avatar</Card>
-  <Card title="Avatar Studio" icon="camera" href="/percify/avatar-studio">Studio concepts & UI</Card>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">Get started in 5 minutes</Card>
+  <Card title="Avatar Studio" icon="camera" href="/percify/avatar-studio">Create amazing avatars</Card>
   <Card title="FAQ" icon="circle-question" href="/percify/faq">Common questions</Card>
 </CardGroup>
 
 ## Support
 
-Need help? Reach out via support email or consult troubleshooting in [/percify/faq].
+Need help? Reach out via [support@percify.io](mailto:support@percify.io) or check our [FAQ](/percify/faq).
 
